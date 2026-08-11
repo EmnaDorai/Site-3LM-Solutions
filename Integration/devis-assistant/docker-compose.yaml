@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:15
+    container_name: devis_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: devis_db
+      POSTGRES_USER: devis_user
+      POSTGRES_PASSWORD: devis_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
