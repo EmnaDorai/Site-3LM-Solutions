@@ -1,13 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Q, UniqueConstraint
 
 
 class Client(models.Model):
+    STATUT_CHOICES = [
+        ('nouveau', 'Nouveau prospect'),
+        ('contacte', 'Contacté'),
+        ('qualifie', 'Qualifié (devis en cours)'),
+        ('client', 'Client (devis envoyé)'),
+        ('perdu', 'Perdu'),
+    ]
+
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100, blank=True)
     entreprise = models.CharField(max_length=200, blank=True)
     email = models.EmailField()
     telephone = models.CharField(max_length=20)
+    message = models.TextField(blank=True, help_text="Message initial laissé via le formulaire public")
+    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='nouveau')
     date_creation = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -100,10 +111,16 @@ class RendezVous(models.Model):
     )
     manager = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
+    SOURCE_CHOICES = [
+        ('interne', 'Proposé par le manager'),
+        ('public', 'Demandé par le visiteur (formulaire en ligne)'),
+    ]
+
     date_rdv = models.DateField()
     heure_rdv = models.TimeField()
     type_rdv = models.CharField(max_length=20, choices=TYPE_CHOICES, default='appel')
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='demande')
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default='interne')
     notes = models.TextField(blank=True, help_text="Objet de l'appel / sujet à aborder")
 
     date_creation = models.DateTimeField(auto_now_add=True)
@@ -113,6 +130,13 @@ class RendezVous(models.Model):
         ordering = ['-date_rdv', '-heure_rdv']
         verbose_name = "Rendez-vous"
         verbose_name_plural = "Rendez-vous (Ligne directe)"
+        constraints = [
+            UniqueConstraint(
+                fields=['date_rdv', 'heure_rdv'],
+                condition=Q(statut__in=['demande', 'confirme']),
+                name='creneau_unique_actif',
+            ),
+        ]
 
     def __str__(self):
         return f"RDV #{self.id} - {self.client.nom} ({self.date_rdv} {self.heure_rdv})"

@@ -1,3 +1,5 @@
+export type StatutClient = 'nouveau' | 'contacte' | 'qualifie' | 'client' | 'perdu';
+
 export interface Client {
   id: number;
   nom: string;
@@ -5,6 +7,8 @@ export interface Client {
   entreprise?: string;
   email: string;
   telephone: string;
+  message?: string;
+  statut?: StatutClient;
   date_creation: string;
 }
 
@@ -31,6 +35,7 @@ export interface Devis {
 
 export type TypeRdv = 'appel' | 'visio' | 'sur_site';
 export type StatutRdv = 'demande' | 'confirme' | 'annule' | 'termine';
+export type SourceRdv = 'interne' | 'public';
 
 export interface RendezVous {
   id: number;
@@ -46,6 +51,7 @@ export interface RendezVous {
   heure_rdv: string;
   type_rdv: TypeRdv;
   statut: StatutRdv;
+  source?: SourceRdv;
   notes?: string;
   date_creation: string;
   date_modification?: string;

@@ -66,6 +66,32 @@ L'équipe commerciale — 3LM Solutions"""
     email.send(fail_silently=False)
 
 
+def envoyer_demande_rdv_public(rendez_vous):
+    """Accuse réception de la demande de rendez-vous soumise via le formulaire public du site."""
+    client = rendez_vous.client
+    type_label = TYPE_RDV_LABELS.get(rendez_vous.type_rdv, rendez_vous.type_rdv)
+    date_str = rendez_vous.date_rdv.strftime('%d/%m/%Y')
+    heure_str = rendez_vous.heure_rdv.strftime('%H:%M')
+
+    sujet = "Nous avons bien reçu votre demande de rendez-vous"
+    corps = f"""Bonjour {client.prenom or client.nom},
+
+Merci pour votre demande ! Nous avons bien noté votre souhait de {type_label} le {date_str} à {heure_str}.
+
+Notre équipe va confirmer ce créneau très prochainement — vous recevrez un email dès que ce sera fait.
+
+Cordialement,
+L'équipe commerciale — 3LM Solutions"""
+
+    email = EmailMessage(
+        subject=sujet,
+        body=corps,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[client.email],
+    )
+    email.send(fail_silently=False)
+
+
 def envoyer_confirmation_rdv(rendez_vous):
     """Envoie un email de confirmation de rendez-vous au client (module Ligne directe)."""
     client = rendez_vous.client

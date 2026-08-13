@@ -1,8 +1,9 @@
 // Sidebar.tsx
 'use client';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import LogoMark from './LogoMark';
+import { clearToken } from '@/lib/auth';
 
 const navItems = [
   {
@@ -35,10 +36,27 @@ const navItems = [
       </svg>
     ),
   },
+  {
+    href: '/prospects',
+    label: 'Prospects',
+    match: (p: string) => p === '/prospects' || p.startsWith('/prospects/'),
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+      </svg>
+    ),
+  },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    clearToken();
+    router.push('/login');
+  };
+
   return (
     <aside className="w-64 shrink-0 bg-[var(--surface)] border-r border-[var(--line)] flex flex-col justify-between">
       <div>
@@ -71,13 +89,21 @@ export default function Sidebar() {
         </nav>
       </div>
       <div className="px-6 py-5 border-t border-[var(--line)]">
-        <p className="text-[11px] text-[var(--ink-soft)] mb-2">v0.3 — assistant IA + ligne directe</p>
-        <div className="flex items-center gap-2 rounded-full px-3 py-1.5 w-fit" style={{ background: '#E9F9EF' }}>
-          <span className="relative flex w-2 h-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ backgroundColor: 'var(--accent-sage)' }} />
-            <span className="relative inline-flex rounded-full w-2 h-2" style={{ backgroundColor: 'var(--accent-sage)' }} />
-          </span>
-          <span className="text-[11px] font-medium" style={{ color: 'var(--accent-sage)' }}>Prêt</span>
+        <p className="text-[11px] text-[var(--ink-soft)] mb-2">v0.4 — assistant IA + ligne directe</p>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 rounded-full px-3 py-1.5 w-fit" style={{ background: '#E9F9EF' }}>
+            <span className="relative flex w-2 h-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ backgroundColor: 'var(--accent-sage)' }} />
+              <span className="relative inline-flex rounded-full w-2 h-2" style={{ backgroundColor: 'var(--accent-sage)' }} />
+            </span>
+            <span className="text-[11px] font-medium" style={{ color: 'var(--accent-sage)' }}>Prêt</span>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="text-[11px] font-medium text-[var(--ink-soft)] hover:text-[var(--accent-brick)] transition-colors"
+          >
+            Déconnexion
+          </button>
         </div>
       </div>
     </aside>

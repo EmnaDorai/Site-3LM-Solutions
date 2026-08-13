@@ -1,6 +1,6 @@
 // layout.tsx
 import type { Metadata } from "next";
-import Sidebar from "@/components/Sidebar";
+import AppShell from "@/components/AppShell";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,10 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr">
       <body>
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main className="flex-1 bg-[var(--paper)] min-h-screen flex flex-col">{children}</main>
-        </div>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

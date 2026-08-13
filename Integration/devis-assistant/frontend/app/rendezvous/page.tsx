@@ -68,14 +68,24 @@ export default function RendezVousListPage() {
         eyebrow="Ligne directe"
         title="Rendez-vous"
         action={
-          <Link
-            href="/rendezvous/nouveau"
-            className="text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5"
-            style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-secondary), var(--accent-primary))' }}
-          >
-            <span className="text-lg leading-none">+</span>
-            Proposer un rendez-vous
-          </Link>
+          <div className="flex items-center gap-3">
+            <a
+              href="/rendez-vous"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-mono-num text-[var(--ink-soft)] hover:text-[var(--accent-secondary)] transition-colors underline underline-offset-2"
+            >
+              Voir le formulaire public ↗
+            </a>
+            <Link
+              href="/rendezvous/nouveau"
+              className="text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5"
+              style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-secondary), var(--accent-primary))' }}
+            >
+              <span className="text-lg leading-none">+</span>
+              Proposer un rendez-vous
+            </Link>
+          </div>
         }
       />
 
@@ -182,7 +192,18 @@ export default function RendezVousListPage() {
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
               <div className="min-w-0 pr-4">
-                <span className="font-medium text-sm block truncate">{rdv.client_nom}</span>
+                <span className="font-medium text-sm truncate flex items-center gap-1.5">
+                  {rdv.client_nom}
+                  {rdv.source === 'public' && (
+                    <span
+                      title="Demandé via le formulaire public du site"
+                      className="text-[9px] uppercase tracking-wider font-mono-num px-1.5 py-0.5 rounded-full shrink-0"
+                      style={{ background: '#E8ECFB', color: 'var(--accent-secondary)' }}
+                    >
+                      En ligne
+                    </span>
+                  )}
+                </span>
                 {rdv.client_entreprise && (
                   <span className="text-[11px] text-[var(--ink-soft)]">{rdv.client_entreprise}</span>
                 )}
