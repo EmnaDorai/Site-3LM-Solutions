@@ -143,6 +143,16 @@ function RendezVousDetailContent() {
           <div className="flex items-center gap-3">
             <h1 className="font-display text-3xl">{rdv.client_nom}</h1>
             <RdvStatusBadge statut={rdv.statut} />
+            <span
+              className="text-[11px] uppercase tracking-wider font-mono-num px-2.5 py-1 rounded-full"
+              style={
+                rdv.source === 'public'
+                  ? { background: '#E8ECFB', color: 'var(--accent-secondary)' }
+                  : { background: '#F1F1F3', color: 'var(--ink-soft)' }
+              }
+            >
+              {rdv.source === 'public' ? 'Demande du client (en ligne)' : "Proposé par l'équipe"}
+            </span>
           </div>
           {rdv.client_entreprise && <p className="text-sm text-[var(--ink-soft)] mt-1">{rdv.client_entreprise}</p>}
         </div>
