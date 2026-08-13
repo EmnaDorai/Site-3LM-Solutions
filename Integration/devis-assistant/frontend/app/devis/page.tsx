@@ -7,7 +7,7 @@ import { Devis } from '@/lib/types';
 import { STATUT_CONFIG } from '@/lib/status';
 import PageHeader from '@/components/PageHeader';
 import StatusBadge from '@/components/StatusBadge';
-import { formatMontant } from '@/lib/devis';
+import { formatMontant, deleteDevis } from '@/lib/devis';
 
 const STATUT_FILTERS = ['tous', ...Object.keys(STATUT_CONFIG)] as const;
 
@@ -22,6 +22,22 @@ export default function DevisListPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statutFilter, setStatutFilter] = useState<string>('tous');
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  const handleDelete = async (e: React.MouseEvent, id: number, clientNom?: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm(`Supprimer définitivement le devis de ${clientNom ?? 'ce client'} ?`)) return;
+    setDeletingId(id);
+    try {
+      await deleteDevis(id);
+      setDevisList((list) => list.filter((d) => d.id !== id));
+    } catch {
+      alert('Impossible de supprimer ce devis.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   useEffect(() => {
     api
@@ -159,17 +175,18 @@ export default function DevisListPage() {
         <p className="text-sm text-[var(--ink-soft)]">Aucun résultat pour cette recherche.</p>
       ) : (
         <div className="rounded-2xl bg-[var(--surface)] border border-[var(--line)] overflow-hidden">
-          <div className="grid grid-cols-[1fr_120px_120px_100px] px-5 py-3 text-[11px] uppercase tracking-wider text-[var(--ink-soft)] border-b border-[var(--line)] font-mono-num">
+          <div className="grid grid-cols-[1fr_120px_120px_100px_36px] px-5 py-3 text-[11px] uppercase tracking-wider text-[var(--ink-soft)] border-b border-[var(--line)] font-mono-num">
             <span>Client</span>
             <span>Statut</span>
             <span className="text-right">Estimation</span>
             <span>Date</span>
+            <span />
           </div>
           {filtered.map((devis) => (
             <Link
               key={devis.id}
               href={`/devis/${devis.id}`}
-              className="grid grid-cols-[1fr_120px_120px_100px] px-5 py-4 items-center border-b border-[var(--line)] last:border-0 transition-colors group"
+              className="grid grid-cols-[1fr_120px_120px_100px_36px] px-5 py-4 items-center border-b border-[var(--line)] last:border-0 transition-colors group"
               style={{ background: 'transparent' }}
               onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(108,92,231,0.04)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
@@ -189,6 +206,17 @@ export default function DevisListPage() {
               <span className="font-mono-num text-xs text-[var(--ink-soft)] group-hover:text-[var(--accent-primary)] transition-colors">
                 {new Date(devis.date_creation).toLocaleDateString('fr-FR')}
               </span>
+              <button
+                type="button"
+                onClick={(e) => handleDelete(e, devis.id, devis.client_nom)}
+                disabled={deletingId === devis.id}
+                title="Supprimer ce devis"
+                className="w-7 h-7 rounded-full flex items-center justify-center text-[var(--ink-soft)] hover:text-white hover:bg-[var(--accent-brick)] transition-colors disabled:opacity-40 justify-self-end"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6h16zM10 11v6M14 11v6" />
+                </svg>
+              </button>
             </Link>
           ))}
         </div>

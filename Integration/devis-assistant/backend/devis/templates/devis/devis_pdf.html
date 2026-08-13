@@ -3,102 +3,186 @@
 <head>
 <meta charset="utf-8">
 <style>
-    @page { size: A4; margin: 2cm; }
-    body { font-family: Helvetica, Arial, sans-serif; font-size: 11pt; color: #0B2A4A; }
+    @page { size: A4; margin: 2cm 0 1.5cm 0; }
+    @page :first { margin-top: 0; }
+    * { box-sizing: border-box; }
+    body { font-family: Helvetica, Arial, sans-serif; font-size: 10.3pt; color: #1E293B; margin: 0; }
+    .page-content { padding: 0 2cm; }
 
-    table.header-band { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-    table.header-band td { background-color: #0B2A4A; padding: 16px 18px; vertical-align: middle; }
-    .logo-cell img { width: 65px; height: 65px; }
-    .company-name { color: #FFFFFF; font-size: 13pt; font-weight: bold; }
-    .devis-title { color: #FFFFFF; text-align: right; }
-    .devis-title .num { font-size: 16pt; font-weight: bold; }
-    .devis-title .date { font-size: 9pt; color: #9FC3DE; margin-top: 2px; }
+    .banner { width: 100%; display: block; line-height: 0; }
+    .banner svg { width: 100%; height: auto; display: block; }
 
-    .status-pill { background-color: #3FC1D6; color: #06222F; font-size: 8pt; text-transform: uppercase;
-        letter-spacing: 1px; padding: 5px 12px; font-weight: bold; }
+    /* ---------- Bloc adresses ---------- */
+    table.addresses { width: 100%; border-collapse: collapse; margin: 14px 0 14px; }
+    .addresses .label { font-size: 7.5pt; text-transform: uppercase; letter-spacing: 1.2px; color: #94A3B8;
+        font-weight: bold; margin-bottom: 6px; }
+    .addresses .name { font-size: 13pt; font-weight: bold; color: #14225C; }
+    .addresses .text { font-size: 9.3pt; color: #475569; line-height: 1.6; margin-top: 3px; }
+    .addresses .right { text-align: right; }
 
-    .meta { margin: 0 0 24px; }
-    .meta table { width: 100%; }
-    .meta td { vertical-align: top; padding: 4px 0; }
-    .meta .label { font-size: 8pt; text-transform: uppercase; color: #0B2A4A; letter-spacing: 1px; margin-bottom: 3px; font-weight: bold; }
+    /* ---------- Synthèse IA ---------- */
+    .synthese { margin-bottom: 12px; padding: 10px 14px; background-color: #FDF2F2; border-left: 4px solid #C81E2C;
+        border-radius: 6px; }
+    .synthese .label { font-size: 7.5pt; text-transform: uppercase; color: #C81E2C; letter-spacing: 1.2px; font-weight: bold; }
+    .synthese p { margin: 5px 0 0; font-size: 9.6pt; line-height: 1.5; color: #3F1416; }
 
-    .synthese { margin-bottom: 24px; padding: 14px 16px; background-color: #EAF6F8; border-left: 3px solid #3FC1D6; }
-    .synthese .label { font-size: 8pt; text-transform: uppercase; color: #0B2A4A; letter-spacing: 1px; font-weight: bold; }
-    .synthese p { margin: 6px 0 0; font-size: 10pt; line-height: 1.5; }
-
-    table.lignes { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
-    table.lignes th { text-align: left; font-size: 8pt; text-transform: uppercase; letter-spacing: 1px;
-        border-bottom: 2px solid #0B2A4A; padding: 8px 4px; color: #5A7891; }
-    table.lignes td { padding: 10px 4px; border-bottom: 1px solid #E1EBF0; font-size: 10pt; }
+    /* ---------- Tableau des lignes ---------- */
+    .lignes-wrap { border: 1.5px solid #C81E2C; border-radius: 16px; margin-bottom: 4px; }
+    table.lignes { width: 100%; border-collapse: collapse; }
+    table.lignes thead td { font-size: 8.3pt; text-transform: uppercase; letter-spacing: 0.8px; font-weight: bold;
+        color: #14225C; padding: 10px 16px; border-bottom: 1.5px solid #C81E2C; }
+    table.lignes tbody td { padding: 9px 16px; font-size: 9.8pt; color: #1E293B; white-space: nowrap; vertical-align: top;
+        border-bottom: 1px solid #F1E4E5; }
+    table.lignes tbody tr:last-child td { border-bottom: none; }
+    table.lignes tbody td.desc-cell { white-space: normal; }
+    .desc-cell .desc-title { font-weight: 600; }
+    .tag { display: inline-block; margin-top: 5px; font-size: 7.3pt; font-weight: bold; letter-spacing: 0.4px;
+        color: #C81E2C; background-color: #FBE1E3; padding: 3px 10px; border-radius: 10px; }
     .text-right { text-align: right; }
 
-    .total-row td { border-top: 2px solid #0B2A4A; border-bottom: none; font-weight: bold; font-size: 13pt;
-        padding-top: 14px; color: #0B2A4A; }
+    /* ---------- Sous-total / total ---------- */
+    table.summary { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    table.summary .sum-row td { padding: 3px 0; font-size: 9.8pt; color: #475569; }
+    table.summary .sum-row td.sum-label { text-align: right; padding-right: 26px; }
+    table.summary .sum-row td.sum-val { text-align: right; width: 110px; white-space: nowrap; }
 
-    .footer { margin-top: 40px; font-size: 8pt; color: #5A7891; border-top: 1px solid #E1EBF0; padding-top: 10px; }
+    .total-bar { display: table; width: 100%; margin-top: 8px; background-color: #C81E2C; border-radius: 10px; }
+    .total-bar .cell { display: table-cell; padding: 10px 20px; color: #FFFFFF; font-size: 12pt; font-weight: bold; vertical-align: middle; }
+    .total-bar .amt { text-align: right; white-space: nowrap; font-size: 13.5pt; }
+
+    /* ---------- Paiement / conditions / signature ---------- */
+    table.bottom-grid { width: 100%; border-collapse: collapse; margin-top: 12px; page-break-inside: avoid; }
+    table.bottom-grid td { vertical-align: top; }
+    .bottom-grid .col-left { width: 58%; padding-right: 14px; }
+    .bottom-grid .col-right { width: 42%; }
+    .block-title { font-size: 9.3pt; font-weight: bold; color: #14225C; margin-bottom: 4px; }
+    .block-text { font-size: 8.6pt; color: #475569; line-height: 1.45; }
+    .block-gap { margin-top: 8px; }
+    .signature-box { border: 1.5px solid #C81E2C; border-radius: 12px; padding: 10px 14px; height: 54px; }
+    .signature-box .field { font-size: 8.8pt; color: #14225C; font-weight: bold; margin-bottom: 14px; }
+
+    .legal { margin-top: 10px; padding-top: 6px; border-top: 1px solid #E2E8F0; font-size: 7.2pt; color: #94A3B8;
+        line-height: 1.4; page-break-inside: avoid; }
 </style>
 </head>
 <body>
-    <table class="header-band">
-    <tr>
-        <td width="20%" class="logo-cell"><img src="{{ logo_data }}" /></td>        <td width="40%" class="company-name">3LM Solutions</td>
-        <td width="45%" class="devis-title">
-            <div class="date">Émis le {{ devis.date_creation|date:"d F Y" }}</div>
-        </td>
-    </tr>
-</table>
 
-    <div class="meta">
-        <table>
+    <div class="banner">
+        <svg viewBox="0 0 1200 180" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#14225C" d="M0,0 L1200,0 L1200,100 C1050,150 950,70 800,95 C600,125 500,60 350,90 C200,115 100,80 0,110 Z" />
+            <path fill="#C81E2C" d="M0,110 C100,80 200,115 350,90 C500,60 600,125 800,95 C950,70 1050,150 1200,100 L1200,122 C1050,172 950,92 800,117 C600,147 500,82 350,112 C200,137 100,102 0,132 Z" />
+
+            <text x="60" y="42" font-family="Helvetica, Arial, sans-serif" font-size="14" letter-spacing="3"
+                fill="#A9B6E8">DEVIS</text>
+            <text x="60" y="82" font-family="Helvetica, Arial, sans-serif" font-size="34" font-weight="bold"
+                fill="#FFFFFF">N&#176; {{ devis.id|stringformat:"04d" }}</text>
+
+            <rect x="60" y="98" width="180" height="26" rx="13" fill="{{ statut_fond }}" />
+            <text x="150" y="115" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="bold"
+                letter-spacing="0.5" fill="{{ statut_couleur }}" text-anchor="middle">{{ statut_label }}</text>
+
+            <image href="{{ logo_path }}" x="900" y="18" width="52" height="52" />
+            <text x="965" y="40" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="bold"
+                fill="#FFFFFF">3LM SOLUTIONS</text>
+            <text x="965" y="56" font-family="Helvetica, Arial, sans-serif" font-size="8.5"
+                fill="#A9B6E8">Conseil &amp; solutions digitales sur mesure</text>
+        </svg>
+    </div>
+
+    <div class="page-content">
+
+        <table class="addresses">
             <tr>
-                <td width="70%">
+                <td width="55%">
                     <div class="label">Client</div>
-                    {{ devis.client.nom }} {{ devis.client.prenom }}<br>
-                    {% if devis.client.entreprise %}{{ devis.client.entreprise }}<br>{% endif %}
-                    {{ devis.client.email }}<br>
-                    {{ devis.client.telephone }}
+                    <div class="name">{{ devis.client.nom }} {{ devis.client.prenom }}</div>
+                    <div class="text">
+                        {% if devis.client.entreprise %}{{ devis.client.entreprise }}<br>{% endif %}
+                        {{ devis.client.email }}{% if devis.client.telephone %}<br>{{ devis.client.telephone }}{% endif %}
+                    </div>
                 </td>
-                <td width="30%" style="text-align:right;">
+                <td width="45%" class="right">
+                    <div class="label">{{ company.nom }}</div>
+                    <div class="text">
+                        {% if company.adresse %}{{ company.adresse }}<br>{% endif %}
+                        {{ company.email }}
+                    </div>
+                    <div class="text" style="margin-top:10px;">Émis le {{ devis.date_creation|date:"d F Y" }}<br>Valable 30 jours</div>
                 </td>
             </tr>
         </table>
-    </div>
 
-    {% if devis.synthese_ia %}
-    <div class="synthese">
-        <div class="label">Synthèse du projet</div>
-        <p>{{ devis.synthese_ia }}</p>
-    </div>
-    {% endif %}
+        {% if devis.synthese_ia %}
+        <div class="synthese">
+            <div class="label">Synthèse du projet</div>
+            <p>{{ devis.synthese_ia }}</p>
+        </div>
+        {% endif %}
 
-    <table class="lignes">
-        <thead>
+        <div class="lignes-wrap">
+            <table class="lignes">
+                <thead>
+                    <tr>
+                        <td width="40%">Description</td>
+                        <td width="20%" class="text-right">Prix unitaire</td>
+                        <td width="16%" class="text-right">Quantité</td>
+                        <td width="24%" class="text-right">Total HT</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ligne in devis.lignes.all %}
+                    <tr>
+                        <td class="desc-cell">
+                            <span class="desc-title">{{ ligne.description }}</span>
+                            {% if ligne.prestation %}<span class="tag">{{ ligne.prestation.get_categorie_display }}</span>{% endif %}
+                        </td>
+                        <td class="text-right">{{ ligne.prix_unitaire }} TND</td>
+                        <td class="text-right">{{ ligne.quantite }}</td>
+                        <td class="text-right">{{ ligne.total }} TND</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <table class="summary">
+            <tr class="sum-row">
+                <td class="sum-label">Sous-total</td>
+                <td class="sum-val">{{ devis.estimation_montant }} TND</td>
+            </tr>
+            <tr class="sum-row">
+                <td class="sum-label">TVA (0%)</td>
+                <td class="sum-val">0.00 TND</td>
+            </tr>
+        </table>
+
+        <div class="total-bar">
+            <div class="cell">Total</div>
+            <div class="cell amt">{{ devis.estimation_montant }} TND</div>
+        </div>
+
+        <table class="bottom-grid">
             <tr>
-                <th>Description</th>
-                <th class="text-right">Qté</th>
-                <th class="text-right">Prix unitaire</th>
-                <th class="text-right">Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ligne in devis.lignes.all %}
-            <tr>
-                <td>{{ ligne.description }}</td>
-                <td class="text-right">{{ ligne.quantite }}</td>
-                <td class="text-right">{{ ligne.prix_unitaire }} TND</td>
-                <td class="text-right">{{ ligne.total }} TND</td>
-            </tr>
-            {% endfor %}
-            <tr class="total-row">
-                <td colspan="3" class="text-right">Total estimé</td>
-                <td class="text-right">{{ devis.estimation_montant }} TND</td>
-            </tr>
-        </tbody>
-    </table>
+                <td class="col-left">
+                    <div class="block-title">Informations de paiement</div>
+                    <div class="block-text">Règlement par virement bancaire ou chèque à l'ordre de {{ company.nom }}.</div>
 
-    <div class="footer">
-        {{ company.nom }}{% if company.adresse %} · {{ company.adresse }}{% endif %}{% if company.email %} · {{ company.email }}{% endif %}{% if company.telephone %} · {{ company.telephone }}{% endif %}<br>
-        Devis valable 30 jours à compter de sa date d'émission. Prix exprimés en dinars tunisiens (TND).
+                    <div class="block-title block-gap">Termes &amp; conditions</div>
+                    <div class="block-text">Ce devis est valable 30 jours à compter de sa date d'émission. Prix exprimés en dinars tunisiens (TND), hors taxes sauf mention contraire.</div>
+                </td>
+                <td class="col-right">
+                    <div class="signature-box">
+                        <div class="field">Date :</div>
+                        <div class="field">Signature :</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="legal">
+            {{ company.nom }}{% if company.adresse %} · {{ company.adresse }}{% endif %}{% if company.email %} · {{ company.email }}{% endif %} · Devis généré avec l'assistant IA 3LM Solutions.
+        </div>
+
     </div>
 </body>
 </html>

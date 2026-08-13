@@ -35,6 +35,37 @@ L'équipe commerciale"""
     email.send(fail_silently=False)
 
 
+def envoyer_proposition_rdv(rendez_vous):
+    """Informe le client qu'un rendez-vous lui est proposé et lui demande de confirmer sa disponibilité."""
+    client = rendez_vous.client
+    type_label = TYPE_RDV_LABELS.get(rendez_vous.type_rdv, rendez_vous.type_rdv)
+    date_str = rendez_vous.date_rdv.strftime('%d/%m/%Y')
+    heure_str = rendez_vous.heure_rdv.strftime('%H:%M')
+
+    devis_ligne = ""
+    if rendez_vous.devis_id:
+        devis_ligne = f"\nCe rendez-vous fait suite à votre devis #{rendez_vous.devis_id}.\n"
+
+    sujet = f"Proposition de rendez-vous — {date_str} à {heure_str}"
+    corps = f"""Bonjour {client.prenom or client.nom},
+
+Nous vous proposons {type_label} le {date_str} à {heure_str}.
+{devis_ligne}
+Merci de nous confirmer votre disponibilité pour ce créneau (par téléphone ou en répondant à cet email).
+À défaut de réponse, n'hésitez pas à nous contacter pour proposer un autre horaire.
+
+Cordialement,
+L'équipe commerciale — 3LM Solutions"""
+
+    email = EmailMessage(
+        subject=sujet,
+        body=corps,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[client.email],
+    )
+    email.send(fail_silently=False)
+
+
 def envoyer_confirmation_rdv(rendez_vous):
     """Envoie un email de confirmation de rendez-vous au client (module Ligne directe)."""
     client = rendez_vous.client

@@ -53,6 +53,10 @@ export async function updateDevis(
   return res.data;
 }
 
+export async function deleteDevis(id: number | string): Promise<void> {
+  await api.delete(`/devis/${id}/`);
+}
+
 export async function telechargerPdfDevis(id: number | string): Promise<void> {
   const res = await api.get(`/devis/${id}/pdf/`, { responseType: 'blob' });
 

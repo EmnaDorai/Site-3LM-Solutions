@@ -2,18 +2,19 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AssistantPanel from '@/components/AssistantPanel';
 import DevisPreview from '@/components/DevisPreview';
 import StatusBadge from '@/components/StatusBadge';
 import LigneDirectePanel from '@/components/LigneDirectePanel';
 import { Devis } from '@/lib/types';
-import { fetchDevis, genererDevisIA, updateDevis, validerDevis, telechargerPdfDevis } from '@/lib/devis';
+import { fetchDevis, genererDevisIA, updateDevis, validerDevis, telechargerPdfDevis, deleteDevis } from '@/lib/devis';
 
 export default function DevisDetailPage() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const id = params.id as string;
 
   const [devis, setDevis] = useState<Devis | null>(null);
@@ -21,6 +22,7 @@ export default function DevisDetailPage() {
   const [generating, setGenerating] = useState(false);
   const [validating, setValidating] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [genError, setGenError] = useState<string | null>(null);
@@ -101,6 +103,19 @@ export default function DevisDetailPage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!devis) return;
+    if (!window.confirm(`Supprimer définitivement le devis de ${devis.client_nom ?? 'ce client'} ? Cette action est irréversible.`)) return;
+    setDeleting(true);
+    try {
+      await deleteDevis(id);
+      router.push('/devis');
+    } catch {
+      setGenError('Impossible de supprimer ce devis.');
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="px-8 py-10">
@@ -172,6 +187,17 @@ export default function DevisDetailPage() {
                 </button>
               </>
             )}
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={deleting}
+              title="Supprimer ce devis"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-[var(--ink-soft)] hover:text-white hover:bg-[var(--accent-brick)] transition-colors disabled:opacity-40"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6h16zM10 11v6M14 11v6" />
+              </svg>
+            </button>
           </div>
         </div>
 

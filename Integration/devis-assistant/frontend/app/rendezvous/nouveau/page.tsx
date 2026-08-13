@@ -75,7 +75,8 @@ function NouveauRendezVousForm() {
         type_rdv: typeRdv,
         notes,
       });
-      router.push(`/rendezvous/${rdv.id}`);
+      const query = rdv.email_warning ? `?warning=${encodeURIComponent(rdv.email_warning)}` : '?created=1';
+      router.push(`/rendezvous/${rdv.id}${query}`);
     } catch {
       setError('Erreur lors de la création du rendez-vous.');
     } finally {

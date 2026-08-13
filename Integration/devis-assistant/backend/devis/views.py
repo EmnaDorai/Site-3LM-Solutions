@@ -6,7 +6,7 @@ from .models import Client, Devis, LigneDevis, Prestation, RendezVous
 from .serializers import ClientSerializer, DevisSerializer, LigneDevisSerializer, PrestationSerializer, RendezVousSerializer
 from .services.ia import generer_devis_ia
 from .services.pdf import generer_pdf_devis
-from .services.email import envoyer_devis_par_email, envoyer_confirmation_rdv
+from .services.email import envoyer_devis_par_email, envoyer_confirmation_rdv, envoyer_proposition_rdv
 
 class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all().order_by('-date_creation')
@@ -133,6 +133,21 @@ class RendezVousViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(manager=self.request.user if self.request.user.is_authenticated else None)
+
+    def create(self, request, *args, **kwargs):
+        """Crée le rendez-vous puis prévient le client par email de la proposition de créneau."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+
+        data = dict(serializer.data)
+        try:
+            envoyer_proposition_rdv(serializer.instance)
+        except Exception as exc:
+            data['email_warning'] = f"Rendez-vous créé mais email de proposition non envoyé : {exc}"
+
+        return Response(data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(detail=True, methods=['post'])
     def confirmer(self, request, pk=None):

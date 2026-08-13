@@ -1,22 +1,26 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { fetchRendezVous, confirmerRendezVous, annulerRendezVous, terminerRendezVous } from '@/lib/rendezvous';
+import { fetchRendezVous, confirmerRendezVous, annulerRendezVous, terminerRendezVous, deleteRendezVous } from '@/lib/rendezvous';
 import { RendezVous } from '@/lib/types';
 import { TYPE_RDV_CONFIG } from '@/lib/statusRdv';
 import RdvStatusBadge from '@/components/RdvStatusBadge';
 
-export default function RendezVousDetailPage() {
+function RendezVousDetailContent() {
   const params = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const id = params.id as string;
 
   const [rdv, setRdv] = useState<RendezVous | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [messageType, setMessageType] = useState<'success' | 'warning'>('success');
 
   const load = useCallback(async () => {
     try {
@@ -32,17 +36,32 @@ export default function RendezVousDetailPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  useEffect(() => {
+    const warning = searchParams.get('warning');
+    const created = searchParams.get('created');
+    if (warning) {
+      setMessage(warning);
+      setMessageType('warning');
+    } else if (created) {
+      setMessage('Rendez-vous créé — email de proposition envoyé au client.');
+      setMessageType('success');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleConfirmer = async () => {
     setActionLoading(true);
     setMessage(null);
     try {
-      const updated = await confirmerRendezVous(id);
-      setRdv(updated);
-      setMessage(
-        updated.statut === 'confirme'
-          ? `Rendez-vous confirmé. Email envoyé à ${updated.client_nom ?? 'client'}.`
-          : 'Rendez-vous confirmé, email non envoyé (vérifiez la configuration SMTP).'
-      );
+      const result = await confirmerRendezVous(id);
+      setRdv(result.rendezVous);
+      if (result.emailError) {
+        setMessage(`Rendez-vous confirmé, mais l'email n'a pas pu être envoyé : ${result.emailError}`);
+        setMessageType('warning');
+      } else {
+        setMessage(`Rendez-vous confirmé. Email envoyé à ${result.rendezVous.client_nom ?? 'client'}.`);
+        setMessageType('success');
+      }
     } catch {
       setError('Impossible de confirmer ce rendez-vous.');
     } finally {
@@ -71,6 +90,19 @@ export default function RendezVousDetailPage() {
       setError('Impossible de clôturer ce rendez-vous.');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!rdv) return;
+    if (!window.confirm(`Supprimer définitivement ce rendez-vous avec ${rdv.client_nom ?? 'ce client'} ?`)) return;
+    setDeleting(true);
+    try {
+      await deleteRendezVous(id);
+      router.push('/rendezvous');
+    } catch {
+      setError('Impossible de supprimer ce rendez-vous.');
+      setDeleting(false);
     }
   };
 
@@ -117,7 +149,14 @@ export default function RendezVousDetailPage() {
       </div>
 
       {message && (
-        <div className="mb-6 px-4 py-3 rounded-lg text-sm border" style={{ background: '#E9F9EF', borderColor: 'var(--accent-sage)', color: 'var(--accent-sage)' }}>
+        <div
+          className="mb-6 px-4 py-3 rounded-lg text-sm border"
+          style={
+            messageType === 'warning'
+              ? { background: '#FFF7E6', borderColor: 'var(--accent-amber)', color: '#92620A' }
+              : { background: '#E9F9EF', borderColor: 'var(--accent-sage)', color: 'var(--accent-sage)' }
+          }
+        >
           {message}
         </div>
       )}
@@ -194,7 +233,24 @@ export default function RendezVousDetailPage() {
             Annuler
           </button>
         )}
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={deleting}
+          className="rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40 ml-auto"
+          style={{ background: 'var(--accent-brick)' }}
+        >
+          {deleting ? 'Suppression...' : 'Supprimer'}
+        </button>
       </div>
     </div>
+  );
+}
+
+export default function RendezVousDetailPage() {
+  return (
+    <Suspense fallback={<div className="px-8 py-10 text-sm text-[var(--ink-soft)]">Chargement...</div>}>
+      <RendezVousDetailContent />
+    </Suspense>
   );
 }

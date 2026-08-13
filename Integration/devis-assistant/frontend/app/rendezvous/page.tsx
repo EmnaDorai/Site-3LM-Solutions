@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { fetchRendezVousList } from '@/lib/rendezvous';
+import { fetchRendezVousList, deleteRendezVous } from '@/lib/rendezvous';
 import { RendezVous } from '@/lib/types';
 import { STATUT_RDV_CONFIG, TYPE_RDV_CONFIG } from '@/lib/statusRdv';
 import PageHeader from '@/components/PageHeader';
@@ -21,6 +21,22 @@ export default function RendezVousListPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statutFilter, setStatutFilter] = useState<string>('tous');
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  const handleDelete = async (e: React.MouseEvent, id: number, clientNom?: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm(`Supprimer définitivement le rendez-vous avec ${clientNom ?? 'ce client'} ?`)) return;
+    setDeletingId(id);
+    try {
+      await deleteRendezVous(id);
+      setList((l) => l.filter((r) => r.id !== id));
+    } catch {
+      alert('Impossible de supprimer ce rendez-vous.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   useEffect(() => {
     fetchRendezVousList()
@@ -148,18 +164,19 @@ export default function RendezVousListPage() {
         <p className="text-sm text-[var(--ink-soft)]">Aucun résultat pour cette recherche.</p>
       ) : (
         <div className="rounded-2xl bg-[var(--surface)] border border-[var(--line)] overflow-hidden">
-          <div className="grid grid-cols-[1fr_140px_120px_100px_100px] px-5 py-3 text-[11px] uppercase tracking-wider text-[var(--ink-soft)] border-b border-[var(--line)] font-mono-num">
+          <div className="grid grid-cols-[1fr_140px_120px_100px_100px_36px] px-5 py-3 text-[11px] uppercase tracking-wider text-[var(--ink-soft)] border-b border-[var(--line)] font-mono-num">
             <span>Client</span>
             <span>Type</span>
             <span>Statut</span>
             <span>Date</span>
             <span>Devis</span>
+            <span />
           </div>
           {filtered.map((rdv) => (
             <Link
               key={rdv.id}
               href={`/rendezvous/${rdv.id}`}
-              className="grid grid-cols-[1fr_140px_120px_100px_100px] px-5 py-4 items-center border-b border-[var(--line)] last:border-0 transition-colors group"
+              className="grid grid-cols-[1fr_140px_120px_100px_100px_36px] px-5 py-4 items-center border-b border-[var(--line)] last:border-0 transition-colors group"
               style={{ background: 'transparent' }}
               onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(67,97,238,0.04)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
@@ -184,6 +201,17 @@ export default function RendezVousListPage() {
                   <span className="text-[var(--ink-soft)]">—</span>
                 )}
               </span>
+              <button
+                type="button"
+                onClick={(e) => handleDelete(e, rdv.id, rdv.client_nom)}
+                disabled={deletingId === rdv.id}
+                title="Supprimer ce rendez-vous"
+                className="w-7 h-7 rounded-full flex items-center justify-center text-[var(--ink-soft)] hover:text-white hover:bg-[var(--accent-brick)] transition-colors disabled:opacity-40 justify-self-end"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6h16zM10 11v6M14 11v6" />
+                </svg>
+              </button>
             </Link>
           ))}
         </div>

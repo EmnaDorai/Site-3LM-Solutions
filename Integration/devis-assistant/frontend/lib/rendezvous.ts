@@ -26,14 +26,24 @@ export interface CreateRendezVousPayload {
   notes?: string;
 }
 
-export async function createRendezVous(data: CreateRendezVousPayload): Promise<RendezVous> {
+export type RendezVousWithEmailStatus = RendezVous & { email_warning?: string };
+
+export async function createRendezVous(data: CreateRendezVousPayload): Promise<RendezVousWithEmailStatus> {
   const res = await api.post('/rendezvous/', data);
   return res.data;
 }
 
-export async function confirmerRendezVous(id: number | string): Promise<RendezVous> {
+export interface ConfirmerResult {
+  rendezVous: RendezVous;
+  emailError?: string;
+}
+
+export async function confirmerRendezVous(id: number | string): Promise<ConfirmerResult> {
   const res = await api.post(`/rendezvous/${id}/confirmer/`);
-  return res.data.rendez_vous ?? res.data;
+  return {
+    rendezVous: res.data.rendez_vous ?? res.data,
+    emailError: res.data.error,
+  };
 }
 
 export async function annulerRendezVous(id: number | string): Promise<RendezVous> {
@@ -44,4 +54,8 @@ export async function annulerRendezVous(id: number | string): Promise<RendezVous
 export async function terminerRendezVous(id: number | string): Promise<RendezVous> {
   const res = await api.post(`/rendezvous/${id}/terminer/`);
   return res.data;
+}
+
+export async function deleteRendezVous(id: number | string): Promise<void> {
+  await api.delete(`/rendezvous/${id}/`);
 }
