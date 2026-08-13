@@ -1,100 +1,176 @@
-# Intégration Ligne Directe ↔ Assistant Devis
+# Assistant IA de Génération de Devis & Ligne Directe — 3LM Solutions
 
-Documentation de l'intégration entre le module **Assistant devis (IA)** et le module **Ligne directe** (prise de rendez-vous), ajoutée au projet 3LM Solutions.
+Application interne développée dans le cadre d'un stage chez **3LM Solutions**. Elle couvre tout le parcours commercial : de l'appel client jusqu'au devis signé, en passant par la prise de rendez-vous de suivi.
 
-## Objectif
+## Fonctionnalités
 
-Permettre à un manager, directement depuis la fiche d'un devis, de proposer et suivre un rendez-vous de suivi avec le client (appel téléphonique, visioconférence ou rendez-vous sur site) — sans quitter le contexte du devis. Le module Ligne directe reste également utilisable de façon autonome, pour des rendez-vous non liés à un devis.
+### 1. Assistant devis (IA)
+- Fiche client (nom, entreprise, email, téléphone)
+- Saisie des besoins bruts du client (notes prises pendant l'appel)
+- Génération automatique par IA (Gemini) d'une synthèse professionnelle, d'une estimation chiffrée et des lignes de devis, à partir du catalogue de prestations de l'entreprise
+- Rattachement intelligent des lignes générées aux prestations du catalogue (prix de référence respectés)
+- Régénération / affinage du devis via des instructions complémentaires (ex. « ajouter une ligne maintenance », « réduire le budget de 20% »)
+- Modification manuelle des besoins avant validation
+- Validation du devis → génération d'un PDF personnalisé et envoi automatique par email au client
+- Téléchargement du PDF une fois le devis validé
+- Registre des devis avec recherche, filtres par statut, et suppression directe depuis l'interface
 
-## Principe du lien
+### 2. Ligne directe (rendez-vous)
+- Registre des rendez-vous (appel téléphonique, visioconférence, ou sur site), liés ou non à un devis
+- Depuis la fiche d'un devis, un bandeau **Ligne directe** permet de proposer un rendez-vous en un clic (client et devis pré-remplis)
+- Cycle de statut : `demandé` → `confirmé` → `terminé`, ou `annulé`
+- Email de **proposition** automatique dès la création du rendez-vous (le client reçoit le créneau suggéré et est invité à confirmer sa disponibilité)
+- Email de **confirmation** automatique lorsque le manager valide le rendez-vous dans l'interface
+- Suppression directe depuis l'interface (registre ou fiche détail)
 
-- Un `RendezVous` peut être créé **avec** ou **sans** `devis` associé (`devis` est une clé étrangère facultative, `null=True, blank=True`).
-- Un `Devis` peut avoir **plusieurs** rendez-vous liés (`related_name='rendez_vous'`).
-- La suppression d'un devis ne supprime pas ses rendez-vous : le champ `devis` passe simplement à `null` (`on_delete=models.SET_NULL`), l'historique du rendez-vous est conservé.
+## Scénario métier (logique complète)
 
-```
-Client 1───N Devis 1───N RendezVous N───1 Client
-                 (devis facultatif sur RendezVous)
-```
+1. **Appel client** — le client appelle et décrit oralement ses besoins.
+2. **Prise de notes** — le manager saisit ces besoins bruts dans « Nouveau devis » (texte libre, pas besoin de le structurer).
+3. **Génération IA** — l'assistant produit automatiquement une synthèse, une estimation et des lignes de devis chiffrées, en s'appuyant sur le catalogue de prestations.
+4. **Relecture / ajustement** — le manager affine si besoin (instructions complémentaires ou modification manuelle des besoins).
+5. **Validation** — le devis est validé → un PDF personnalisé (logo, couleurs de l'entreprise) est généré et envoyé automatiquement par email au client : c'est le devis officiel.
+6. **Proposition de rendez-vous** — pour clarifier un point ou négocier, le manager propose un rendez-vous de suivi via le bandeau **Ligne directe** sur la fiche du devis (appel, visio, ou sur site).
+7. **Notification au client** — dès la création du rendez-vous (statut « demandé »), un email de proposition part automatiquement au client avec le créneau suggéré, en lui demandant de confirmer sa disponibilité (par téléphone ou en répondant à l'email) — l'outil n'ayant pas de portail client en libre-service, la confirmation se fait oralement ou par retour d'email.
+8. **Confirmation** — une fois l'accord du client obtenu, le manager clique sur « Confirmer » dans l'interface → statut « confirmé » + email de confirmation officielle envoyé au client (trace écrite du rendez-vous).
+9. **Suivi** — après l'échange, le manager marque le rendez-vous « Terminé ». En cas d'annulation ou d'absence de réponse, il passe à « Annulé ».
+10. **Registre** — devis et rendez-vous restent consultables, filtrables, et supprimables à tout moment depuis les registres `/devis` et `/rendezvous`.
 
-## Ce qui a été ajouté
+## Le PDF de devis
 
-### Backend (`backend/devis/`)
+Le PDF est généré avec **WeasyPrint** (et non plus xhtml2pdf, abandonné pour un rendu CSS trop limité : pas de courbes, mauvaise gestion des coins arrondis et des images). Design :
 
-| Fichier | Changement |
-|---|---|
-| `models.py` | Nouveau modèle `RendezVous` (client, devis optionnel, manager, date_rdv, heure_rdv, type_rdv, statut, notes) |
-| `migrations/0003_rendezvous.py` | Migration créant la table `devis_rendezvous` |
-| `serializers.py` | `RendezVousSerializer` (expose `client_nom`, `client_entreprise`, `client_telephone`, `client_email`, `devis_statut` en lecture seule) |
-| `views.py` | `RendezVousViewSet` : filtrage par `?devis=`, `?client=`, `?statut=` ; actions `confirmer/`, `annuler/`, `terminer/` |
-| `urls.py` | Route `router.register(r'rendezvous', RendezVousViewSet, basename='rendezvous')` |
-| `admin.py` | `RendezVousAdmin` enregistré dans l'admin Django |
-| `services/email.py` | `envoyer_confirmation_rdv(rendez_vous)` — envoie un email au client lors de la confirmation, mentionne le devis lié si présent |
+- Bandeau plein largeur en dégradé de vague bleu marine / rouge (SVG vectoriel), avec le numéro du devis, un badge de statut coloré (brouillon / validé / envoyé...), le logo et le nom de 3LM Solutions
+- Bloc adresses Client / Entreprise, synthèse IA en encart coloré
+- Tableau des lignes à bordure arrondie rouge, catégories de prestations en puces colorées
+- Sous-total / TVA / barre « Total » pleine largeur
+- Bloc informations de paiement, conditions, et encadré Date/Signature
+- Pagination propre : si le devis dépasse une page, un espace d'en-tête (2 cm) est réservé sur les pages suivantes, et le tableau des lignes peut se répartir sur plusieurs pages sans perte de données (l'en-tête du tableau se répète automatiquement)
 
-### Frontend (`frontend/`)
-
-| Fichier | Rôle |
-|---|---|
-| `components/LogoMark.tsx` | Logo 3LM Solutions en SVG |
-| `components/Sidebar.tsx` | Ajout du logo + entrée de navigation « Ligne directe » |
-| `components/RdvStatusBadge.tsx` | Badge de statut (demandé / confirmé / annulé / terminé) |
-| `components/LigneDirectePanel.tsx` | **Point d'intégration principal** — bandeau affiché sur la page détail d'un devis |
-| `lib/types.ts` | Types `RendezVous`, `TypeRdv`, `StatutRdv` |
-| `lib/statusRdv.ts` | Config des libellés/couleurs de statut et type de rendez-vous |
-| `lib/rendezvous.ts` | Appels API (`fetchRendezVousList`, `createRendezVous`, `confirmerRendezVous`, `annulerRendezVous`, `terminerRendezVous`) |
-| `app/rendezvous/page.tsx` | Registre des rendez-vous (stats, recherche, filtre par statut) |
-| `app/rendezvous/nouveau/page.tsx` | Création d'un rendez-vous, pré-rempli si lancé depuis un devis (`?client=&devis=`) |
-| `app/rendezvous/[id]/page.tsx` | Détail d'un rendez-vous + actions confirmer/annuler/terminer |
-| `app/devis/[id]/page.tsx` | Import et affichage de `<LigneDirectePanel devisId={devis.id} clientId={devis.client} />` sous l'en-tête |
-
-## Comment ça s'active dans le parcours devis
-
-1. Le manager ouvre un devis (`/devis/{id}`).
-2. Sous l'en-tête, le composant `LigneDirectePanel` interroge `GET /api/rendezvous/?devis={id}` :
-   - **Aucun rendez-vous trouvé** → un bouton « Proposer un rendez-vous » redirige vers `/rendezvous/nouveau?client={clientId}&devis={devisId}`, avec le client et le devis déjà pré-remplis.
-   - **Rendez-vous existant** → affiche la date, l'heure, le type et le statut, avec un lien vers sa fiche détaillée.
-3. Une fois le rendez-vous confirmé (`POST /api/rendezvous/{id}/confirmer/`), un email de confirmation part automatiquement vers le client, et le bandeau sur la page devis se met à jour au prochain chargement.
-
-## Endpoints ajoutés
-
-| Méthode | Endpoint | Description |
-|---|---|---|
-| GET/POST | `/api/rendezvous/` | Liste / création — filtrable par `?devis=`, `?client=`, `?statut=` |
-| GET/PATCH/DELETE | `/api/rendezvous/{id}/` | Détail / mise à jour / suppression |
-| POST | `/api/rendezvous/{id}/confirmer/` | Passe le statut à `confirme` + envoie l'email de confirmation |
-| POST | `/api/rendezvous/{id}/annuler/` | Passe le statut à `annule` |
-| POST | `/api/rendezvous/{id}/terminer/` | Passe le statut à `termine` |
-
-## Mise en place
+### Installation de WeasyPrint (Windows)
 
 ```bash
-# Backend
 cd backend
 venv\Scripts\activate
-python manage.py migrate          # applique 0003_rendezvous
-python manage.py runserver
+pip install weasyprint
+```
 
-# Frontend (autre terminal)
+WeasyPrint dépend des librairies GTK (Pango/Cairo/GDK-PixBuf), absentes de Python sur Windows :
+
+1. Téléchargez et installez le [GTK3 runtime pour Windows](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases) (`gtk3-runtime-*-win64.exe`), en cochant l'ajout au PATH.
+2. Redémarrez le terminal (ou l'ordinateur si besoin).
+3. Vérifiez : `python -c "import weasyprint; print('ok')"`.
+
+## Stack technique
+
+| Côté      | Technologies |
+|-----------|--------------|
+| Backend   | Django 5.2, Django REST Framework, PostgreSQL, Gemini API (`google-generativeai`), WeasyPrint (PDF), django-cors-headers |
+| Frontend  | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, Axios |
+| Email     | SMTP (Brevo) ou backend console en développement |
+
+## Structure du projet
+
+```
+devis-assistant/
+├── docker-compose.yaml        # PostgreSQL en conteneur
+├── backend/
+│   ├── manage.py
+│   ├── .env                   # variables d'environnement (non versionné)
+│   ├── devis_project/         # settings, urls, wsgi
+│   └── devis/                 # app Django principale
+│       ├── models.py          # Client, Devis, Prestation, LigneDevis, RendezVous
+│       ├── serializers.py
+│       ├── views.py           # ViewSets DRF (devis, clients, prestations, rendezvous)
+│       ├── urls.py
+│       ├── admin.py
+│       ├── templates/devis/devis_pdf.html   # template PDF (WeasyPrint)
+│       └── services/
+│           ├── ia.py          # génération du devis via Gemini
+│           ├── pdf.py         # génération du PDF (WeasyPrint)
+│           └── email.py       # envoi devis + proposition/confirmation RDV
+└── frontend/
+    ├── app/
+    │   ├── devis/              # registre, création, détail du devis
+    │   └── rendezvous/         # registre, création, détail des rendez-vous (Ligne directe)
+    ├── components/             # Sidebar, LogoMark, AssistantPanel, DevisPreview, LigneDirectePanel, ...
+    └── lib/                    # api.ts, types.ts, devis.ts, rendezvous.ts, status.ts, statusRdv.ts
+```
+
+## Installation
+
+### 1. Base de données
+
+```bash
+docker compose up -d
+```
+
+### 2. Backend (Django)
+
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # Linux / macOS
+
+pip install django djangorestframework django-cors-headers psycopg2-binary python-dotenv google-generativeai weasyprint
+python manage.py migrate
+python manage.py createsuperuser  # facultatif, pour /admin/
+python manage.py runserver
+```
+
+### 3. Frontend (Next.js)
+
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Pré-requis : le conteneur PostgreSQL doit tourner (`docker compose up -d` depuis la racine du projet) avant de lancer le backend.
+Frontend sur `http://localhost:3000`, API sur `http://127.0.0.1:8000/api/`.
 
-## Scénario de test end-to-end
+## Variables d'environnement (`backend/.env`)
 
-1. Créer/ouvrir un devis pour un client ayant un email valide.
-2. Sur `/devis/{id}`, cliquer sur « Proposer un rendez-vous » dans le bandeau Ligne directe.
-3. Remplir date, heure, type de rendez-vous → valider.
-4. Sur la fiche du rendez-vous créé, cliquer sur « Confirmer le rendez-vous ».
-5. Vérifier :
-   - le statut passe à **Confirmé** ;
-   - un email de confirmation est reçu par le client (ou visible dans la console si `EMAIL_BACKEND` est en mode console) ;
-   - en retournant sur `/devis/{id}`, le bandeau Ligne directe affiche désormais ce rendez-vous ;
-   - le rendez-vous apparaît aussi dans le registre général `/rendezvous` avec un lien vers le devis (`#{id}`).
+```env
+DB_NAME=devis_db
+DB_USER=devis_user
+DB_PASSWORD=devis_pass
+DB_HOST=localhost
+DB_PORT=5432
+
+GEMINI_API_KEY=votre_cle_gemini
+USE_MOCK_IA=false          # true = simule la génération IA sans appeler Gemini
+
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp-relay.brevo.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=true
+EMAIL_HOST_USER=votre_identifiant_smtp
+EMAIL_HOST_PASSWORD=votre_mot_de_passe_smtp
+DEFAULT_FROM_EMAIL=contact@3lmsolutions.tn
+```
+
+> En développement, `EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend` affiche les emails dans le terminal au lieu de les envoyer réellement.
+
+## Principaux endpoints API
+
+| Méthode | Endpoint | Description |
+|---|---|---|
+| GET/POST | `/api/clients/` | Liste / création de clients |
+| GET/POST | `/api/devis/` | Liste / création de devis |
+| GET/PATCH/DELETE | `/api/devis/{id}/` | Détail / mise à jour / suppression |
+| POST | `/api/devis/{id}/generer_ia/` | Génère la synthèse + lignes via l'IA |
+| POST | `/api/devis/{id}/valider/` | Valide le devis, génère le PDF, l'envoie par email |
+| GET | `/api/devis/{id}/pdf/` | Télécharge le PDF (devis validé uniquement) |
+| GET/POST | `/api/prestations/` | Catalogue de prestations |
+| GET/POST | `/api/rendezvous/` | Liste / création de rendez-vous (filtrable par `?devis=`, `?client=`, `?statut=`) |
+| GET/PATCH/DELETE | `/api/rendezvous/{id}/` | Détail / mise à jour / suppression |
+| POST | `/api/rendezvous/{id}/confirmer/` | Confirme le rendez-vous + email de confirmation |
+| POST | `/api/rendezvous/{id}/annuler/` | Annule le rendez-vous |
+| POST | `/api/rendezvous/{id}/terminer/` | Marque le rendez-vous comme terminé |
 
 ## Notes
 
-- Le champ `devis` sur `RendezVous` est facultatif : le module reste utilisable de façon 100% indépendante depuis `/rendezvous/nouveau` (sans query params).
-- L'envoi d'email de confirmation échoue silencieusement côté statut (le rendez-vous reste confirmé même si l'email ne part pas) — l'erreur est renvoyée dans la réponse API (`status: "rendez-vous confirmé mais email non envoyé"`) pour information au manager.
+- `USE_MOCK_IA=true` permet de tester le flux de bout en bout sans consommer de quota Gemini.
+- `DEBUG=True` et `SECRET_KEY` en dur dans `settings.py` sont adaptés au développement uniquement — à sécuriser avant toute mise en production.
+- Le module Ligne directe fonctionne aussi de façon 100% autonome (rendez-vous non lié à un devis), accessible via `/rendezvous/nouveau` sans paramètres.
