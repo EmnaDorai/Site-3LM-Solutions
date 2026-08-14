@@ -41,7 +41,7 @@ export default function AssistantPanel({
   const hasSynthese = Boolean(synthese?.trim());
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col">
       <div className="px-6 py-5 border-b border-[var(--line)] bg-[var(--surface)]">
         <div className="flex items-center gap-3">
           <div
@@ -59,7 +59,7 @@ export default function AssistantPanel({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-5 space-y-4 assistant-scroll">
+      <div className="p-5 space-y-4">
         {/* Message utilisateur : besoins */}
         <div className="flex gap-3">
           <div className="w-7 h-7 shrink-0 rounded-full bg-[var(--line)] flex items-center justify-center text-[10px] font-mono-num uppercase">
@@ -215,7 +215,7 @@ export default function AssistantPanel({
               type="button"
               onClick={handleGenerate}
               disabled={generating}
-              className="shrink-0 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 disabled:opacity-40 flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5"
+              className="btn-press shrink-0 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 disabled:opacity-40 flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5"
               style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))' }}
             >
               {generating ? (

@@ -3,7 +3,7 @@ from .views import ClientViewSet, DevisViewSet, PrestationViewSet, RendezVousVie
 
 router = DefaultRouter()
 router.register(r'clients', ClientViewSet, basename='clients')
-router.register(r'devis', DevisViewSet)
+router.register(r'devis', DevisViewSet, basename='devis')
 router.register(r'prestations', PrestationViewSet)
 router.register(r'rendezvous', RendezVousViewSet, basename='rendezvous')
 

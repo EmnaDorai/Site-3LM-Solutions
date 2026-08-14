@@ -8,6 +8,7 @@ import { STATUT_CONFIG } from '@/lib/status';
 import PageHeader from '@/components/PageHeader';
 import StatusBadge from '@/components/StatusBadge';
 import { formatMontant, deleteDevis } from '@/lib/devis';
+import { useToast } from '@/components/ToastProvider';
 
 const STATUT_FILTERS = ['tous', ...Object.keys(STATUT_CONFIG)] as const;
 
@@ -18,6 +19,7 @@ const STAT_ACCENTS = [
 ];
 
 export default function DevisListPage() {
+  const toast = useToast();
   const [devisList, setDevisList] = useState<Devis[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -32,8 +34,9 @@ export default function DevisListPage() {
     try {
       await deleteDevis(id);
       setDevisList((list) => list.filter((d) => d.id !== id));
+      toast.success('Devis supprimé.');
     } catch {
-      alert('Impossible de supprimer ce devis.');
+      toast.error('Impossible de supprimer ce devis.');
     } finally {
       setDeletingId(null);
     }
@@ -72,7 +75,7 @@ export default function DevisListPage() {
         action={
           <Link
             href="/devis/nouveau"
-            className="text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5"
+            className="btn-press text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5"
             style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', boxShadow: 'var(--shadow-glow)' }}
           >
             <span className="text-lg leading-none">+</span>
@@ -90,7 +93,7 @@ export default function DevisListPage() {
           ].map((s, i) => (
             <div
               key={s.label}
-              className="relative overflow-hidden rounded-2xl bg-[var(--surface)] border border-[var(--line)] px-5 py-4"
+              className="card-hover relative overflow-hidden rounded-2xl bg-[var(--surface)] border border-[var(--line)] px-5 py-4"
             >
               <div
                 className="absolute top-0 left-0 w-full h-1"
@@ -182,12 +185,12 @@ export default function DevisListPage() {
             <span>Date</span>
             <span />
           </div>
-          {filtered.map((devis) => (
+          {filtered.map((devis, i) => (
             <Link
               key={devis.id}
               href={`/devis/${devis.id}`}
-              className="grid grid-cols-[1fr_120px_120px_100px_36px] px-5 py-4 items-center border-b border-[var(--line)] last:border-0 transition-colors group"
-              style={{ background: 'transparent' }}
+              className="row-in grid grid-cols-[1fr_120px_120px_100px_36px] px-5 py-4 items-center border-b border-[var(--line)] last:border-0 transition-colors group"
+              style={{ background: 'transparent', animationDelay: `${Math.min(i, 10) * 25}ms` }}
               onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(108,92,231,0.04)')}
               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >

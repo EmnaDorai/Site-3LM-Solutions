@@ -1,4 +1,5 @@
 /* globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -10,6 +11,14 @@
   --accent-sage:#1E9E5A;      /* validé */
   --accent-brick:#E23B3B;     /* erreur */
   --accent-amber:#F59E0B;     /* en attente */
+
+  --font-heading: 'Manrope', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --shadow-soft: 0 1px 2px rgba(26,26,46,0.04), 0 8px 24px rgba(26,26,46,0.05);
+  --shadow-lift: 0 10px 28px rgba(26,26,46,0.10);
+  --shadow-glow: 0 10px 26px rgba(67,97,238,0.22);
 }
 
 body {
@@ -21,9 +30,10 @@ body {
 h1, h2, h3, .font-display {
   font-family: var(--font-heading), sans-serif;
   font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
-.font-mono-num { font-family: var(--font-mono), monospace; }
+.font-mono-num { font-family: var(--font-mono), monospace; font-feature-settings: 'tnum'; }
 
 ::selection { background: var(--accent-primary); color: #fff; }
 
@@ -45,6 +55,33 @@ h1, h2, h3, .font-display {
 .ai-dot-delay-1 { animation-delay: 0.2s; }
 .ai-dot-delay-2 { animation-delay: 0.4s; }
 
-.assistant-scroll { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
-.assistant-scroll::-webkit-scrollbar { width: 6px; }
-.assistant-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+.assistant-scroll, .app-scroll { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.assistant-scroll::-webkit-scrollbar, .app-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.assistant-scroll::-webkit-scrollbar-thumb, .app-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+
+/* Carte interactive générique : légère élévation au survol */
+.card-hover { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.card-hover:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); border-color: rgba(67,97,238,0.25); }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Transition d'entrée douce entre les pages de l'espace équipe */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-transition { animation: page-in 0.25s ease-out; }
+
+/* Micro-interaction tactile pour les boutons d'action principaux */
+.btn-press { transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease; }
+.btn-press:active { transform: scale(0.97); }
+
+/* Apparition progressive des lignes de tableau/listes */
+@keyframes row-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.row-in { animation: row-in 0.3s ease-out backwards; }

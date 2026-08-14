@@ -13,6 +13,7 @@ import { RendezVous } from '@/lib/types';
 import { STATUT_RDV_CONFIG, TYPE_RDV_CONFIG } from '@/lib/statusRdv';
 import PageHeader from '@/components/PageHeader';
 import RdvStatusBadge from '@/components/RdvStatusBadge';
+import { useToast } from '@/components/ToastProvider';
 
 const STATUT_FILTERS = ['tous', ...Object.keys(STATUT_RDV_CONFIG)] as const;
 
@@ -31,9 +32,12 @@ interface RowProps {
   onDelete: (id: number, nom?: string) => void;
 }
 
-function RendezVousRow({ rdv, busy, onConfirmer, onAnnuler, onTerminer, onDelete }: RowProps) {
+function RendezVousRow({ rdv, busy, index = 0, onConfirmer, onAnnuler, onTerminer, onDelete }: RowProps & { index?: number }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4 border-b border-[var(--line)] last:border-0">
+    <div
+      className="row-in flex flex-col sm:flex-row sm:items-center gap-3 px-5 py-4 border-b border-[var(--line)] last:border-0 transition-colors hover:bg-[rgba(108,92,231,0.03)]"
+      style={{ animationDelay: `${Math.min(index, 10) * 25}ms` }}
+    >
       <Link href={`/rendezvous/${rdv.id}`} className="flex-1 min-w-0 flex items-center gap-4 group">
         <div className="min-w-0 w-40 shrink-0">
           <span className="font-medium text-sm block truncate group-hover:text-[var(--accent-secondary)] transition-colors">
@@ -131,8 +135,8 @@ function RendezVousSection({ title, hint, badgeColor, items, busyId, ...actions 
         </div>
       ) : (
         <div className="rounded-2xl bg-[var(--surface)] border border-[var(--line)] overflow-hidden">
-          {items.map((rdv) => (
-            <RendezVousRow key={rdv.id} rdv={rdv} busy={busyId === rdv.id} {...actions} />
+          {items.map((rdv, i) => (
+            <RendezVousRow key={rdv.id} rdv={rdv} busy={busyId === rdv.id} index={i} {...actions} />
           ))}
         </div>
       )}
@@ -141,6 +145,7 @@ function RendezVousSection({ title, hint, badgeColor, items, busyId, ...actions 
 }
 
 export default function RendezVousListPage() {
+  const toast = useToast();
   const [list, setList] = useState<RendezVous[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -179,8 +184,9 @@ export default function RendezVousListPage() {
     try {
       const { rendezVous } = await confirmerRendezVous(id);
       setList((l) => l.map((r) => (r.id === id ? rendezVous : r)));
+      toast.success('Rendez-vous confirmé.');
     } catch {
-      alert('Impossible de confirmer ce rendez-vous.');
+      toast.error('Impossible de confirmer ce rendez-vous.');
     } finally {
       setBusyId(null);
     }
@@ -191,8 +197,9 @@ export default function RendezVousListPage() {
     try {
       const updated = await annulerRendezVous(id);
       setList((l) => l.map((r) => (r.id === id ? updated : r)));
+      toast.success('Rendez-vous annulé.');
     } catch {
-      alert('Impossible d’annuler ce rendez-vous.');
+      toast.error('Impossible d’annuler ce rendez-vous.');
     } finally {
       setBusyId(null);
     }
@@ -203,8 +210,9 @@ export default function RendezVousListPage() {
     try {
       const updated = await terminerRendezVous(id);
       setList((l) => l.map((r) => (r.id === id ? updated : r)));
+      toast.success('Rendez-vous clôturé.');
     } catch {
-      alert('Impossible de clôturer ce rendez-vous.');
+      toast.error('Impossible de clôturer ce rendez-vous.');
     } finally {
       setBusyId(null);
     }
@@ -216,8 +224,9 @@ export default function RendezVousListPage() {
     try {
       await deleteRendezVous(id);
       setList((l) => l.filter((r) => r.id !== id));
+      toast.success('Rendez-vous supprimé.');
     } catch {
-      alert('Impossible de supprimer ce rendez-vous.');
+      toast.error('Impossible de supprimer ce rendez-vous.');
     } finally {
       setBusyId(null);
     }
@@ -242,7 +251,7 @@ export default function RendezVousListPage() {
             </a>
             <Link
               href="/rendezvous/nouveau"
-              className="text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5"
+              className="btn-press text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5"
               style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-secondary), var(--accent-primary))' }}
             >
               <span className="text-lg leading-none">+</span>
@@ -259,7 +268,7 @@ export default function RendezVousListPage() {
             { label: 'Demandés', value: stats.demandes },
             { label: 'Confirmés', value: stats.confirmes },
           ].map((s, i) => (
-            <div key={s.label} className="relative overflow-hidden rounded-2xl bg-[var(--surface)] border border-[var(--line)] px-5 py-4">
+            <div key={s.label} className="card-hover relative overflow-hidden rounded-2xl bg-[var(--surface)] border border-[var(--line)] px-5 py-4">
               <div
                 className="absolute top-0 left-0 w-full h-1"
                 style={{ backgroundImage: `linear-gradient(90deg, ${STAT_ACCENTS[i].from}, ${STAT_ACCENTS[i].to})` }}

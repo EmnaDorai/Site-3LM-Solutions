@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
 import { Client } from '@/lib/types';
 import PageHeader from '@/components/PageHeader';
+import ClientPicker from '@/components/ClientPicker';
 
 const EXEMPLES_BESOINS = [
   {
@@ -33,10 +34,13 @@ function StepBadge({ n }: { n: number }) {
   );
 }
 
-export default function NouveauDevisPage() {
+function NouveauDevisForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const preselectedClient = searchParams.get('client') ?? '';
+
   const [clients, setClients] = useState<Client[]>([]);
-  const [clientId, setClientId] = useState('');
+  const [clientId, setClientId] = useState(preselectedClient);
   const [besoins, setBesoins] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingClients, setLoadingClients] = useState(true);
@@ -94,45 +98,13 @@ export default function NouveauDevisPage() {
               Client
             </span>
           </div>
-          {loadingClients ? (
-            <p className="text-sm text-[var(--ink-soft)]">Chargement...</p>
-          ) : clients.length === 0 ? (
-            <p className="text-sm text-[var(--ink-soft)]">Aucun client disponible.</p>
-          ) : (
-            <div className="grid sm:grid-cols-2 gap-3">
-              {clients.map((c) => {
-                const selected = String(c.id) === clientId;
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => setClientId(String(c.id))}
-                    className={`text-left p-4 rounded-xl border-2 transition-all duration-200 ${
-                      selected
-                        ? 'border-transparent bg-[var(--surface)] shadow-md'
-                        : 'border-[var(--line)] bg-[var(--surface)] hover:border-[var(--accent-secondary)]'
-                    }`}
-                    style={
-                      selected
-                        ? {
-                            backgroundImage:
-                              'linear-gradient(var(--surface), var(--surface)), linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                            backgroundOrigin: 'border-box',
-                            backgroundClip: 'padding-box, border-box',
-                          }
-                        : undefined
-                    }
-                  >
-                    <p className="font-medium text-sm">{c.nom}</p>
-                    {c.entreprise && (
-                      <p className="text-xs text-[var(--ink-soft)] mt-0.5">{c.entreprise}</p>
-                    )}
-                    <p className="text-xs text-[var(--ink-soft)] font-mono-num mt-1">{c.email}</p>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          <ClientPicker
+            clients={clients}
+            loading={loadingClients}
+            selectedId={clientId}
+            onSelect={setClientId}
+            locked={Boolean(preselectedClient)}
+          />
         </section>
 
         {/* Besoins */}
@@ -222,5 +194,13 @@ export default function NouveauDevisPage() {
         </section>
       </form>
     </div>
+  );
+}
+
+export default function NouveauDevisPage() {
+  return (
+    <Suspense fallback={null}>
+      <NouveauDevisForm />
+    </Suspense>
   );
 }

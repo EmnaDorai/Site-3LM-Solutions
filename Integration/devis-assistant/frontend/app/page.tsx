@@ -1,74 +1,126 @@
 import Link from 'next/link';
-import PublicNav from '@/components/PublicNav';
-import LogoMark from '@/components/LogoMark';
+import SiteNavbar from '@/components/site/SiteNavbar';
+import SiteFooter from '@/components/site/SiteFooter';
+import '@/components/site/tokens.css';
+import '@/components/site/Home.css';
+
+const expertises = [
+  ['01', 'Intelligence artificielle', 'Agents autonomes, assistants métiers et modèles conçus pour automatiser vos décisions.'],
+  ['02', 'Développement web & mobile', 'Plateformes rapides, sécurisées et pensées pour scaler avec votre activité.'],
+  ['03', 'Data, ERP & Cloud', 'Infrastructures fiables, données exploitables et processus métiers digitalisés.'],
+] as const;
+
+const services = [
+  'Intelligence Artificielle', 'Analyse des données', 'IoT', 'DevOps & Cloud',
+  'Développement Web', 'Développement Mobile', 'Solutions ERP', 'Community Management',
+];
+
+const stack = [
+  'React / Next.js', 'Python / Django', 'OpenAI & Gemini', 'PostgreSQL',
+  'Docker', 'Kubernetes', 'AWS / GCP', 'Flutter / React Native',
+];
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <PublicNav />
-
-      <main className="flex-1">
-        <section className="max-w-5xl mx-auto px-6 py-20 text-center">
-          <div className="mx-auto mb-6 flex justify-center">
-            <LogoMark size={64} />
+    <div className="site-lm">
+      <SiteNavbar />
+      <main className="home-page">
+        <section className="home-hero">
+          <div className="hero-bg" aria-hidden="true" />
+          <div className="home-hero-copy">
+            <span className="hero-badge"><span className="dot" />Studio tech basé à Ariana, Tunisie</span>
+            <h1>
+              L&rsquo;équipe qui construit vos <span className="gradient-text">produits digitaux</span> et vos <span className="gradient-text">agents IA</span>.
+            </h1>
+            <p>
+              3LM Solutions conçoit et déploie des plateformes web, applications mobiles, agents IA et
+              infrastructures cloud pour des entreprises qui veulent avancer vite, sans sacrifier la fiabilité.
+            </p>
+            <div className="home-actions">
+              <Link href="/rendez-vous" className="gradient-button">Réserver un appel découverte →</Link>
+              <a href="#expertises" className="light-button">Voir notre expertise</a>
+            </div>
           </div>
-          <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: 'var(--accent-secondary)' }}>
-            3LM Solutions
-          </p>
-          <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight mb-5">
-            Conseil &amp; solutions digitales sur mesure
-          </h1>
-          <p className="text-[var(--ink-soft)] text-base max-w-xl mx-auto mb-10 leading-relaxed">
-            Décrivez-nous votre projet, nous vous recontactons rapidement pour en discuter et vous
-            proposer un devis adapté à vos besoins.
-          </p>
-          <Link
-            href="/rendez-vous"
-            className="inline-flex items-center gap-2 text-white px-7 py-3.5 rounded-full text-sm font-medium hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
-            style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-secondary), var(--accent-primary))' }}
-          >
-            Prendre rendez-vous
-          </Link>
         </section>
 
-        <section className="max-w-5xl mx-auto px-6 pb-20 grid sm:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6">
-            <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center text-white mb-4"
-              style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-secondary), var(--accent-primary))' }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z" />
-              </svg>
-            </div>
-            <h2 className="font-display text-lg font-semibold mb-2">Échangeons sur votre projet</h2>
-            <p className="text-sm text-[var(--ink-soft)] leading-relaxed">
-              Choisissez un créneau qui vous convient — par téléphone, en visio ou sur site — pour
-              présenter votre besoin à notre équipe commerciale.
-            </p>
+        <div className="tech-strip">
+          <span>Technologies que nous maîtrisons au quotidien</span>
+          <div className="tech-pills">
+            {stack.map((tech) => <em key={tech}>{tech}</em>)}
           </div>
+        </div>
 
-          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6">
-            <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center text-white mb-4"
-              style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))' }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M9 12h6M9 16h6M9 8h6M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z" />
-              </svg>
-            </div>
-            <h2 className="font-display text-lg font-semibold mb-2">Un devis rapide et clair</h2>
-            <p className="text-sm text-[var(--ink-soft)] leading-relaxed">
-              Suite à notre échange, vous recevez un devis détaillé par email, chiffré et adapté
-              précisément à votre besoin.
-            </p>
+        <section className="home-expertise" id="expertises">
+          <div className="section-marker"><span />Expertise</div>
+          <div className="section-heading">
+            <h2>Stratégie, conception et exécution technique — sous un même toit.</h2>
+            <p>Une équipe unique pour transformer vos idées en outils numériques fiables et mesurables.</p>
           </div>
+          <div className="discipline-grid">
+            {expertises.map(([code, title, text]) => (
+              <Link href="/rendez-vous" className="discipline-card" key={title}>
+                <span className="discipline-code">{code}</span>
+                <h3>{title}</h3>
+                <p>{text}</p>
+                <span className="card-link">Découvrir l&rsquo;expertise →</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="home-why" id="methodologie">
+          <div className="why-layout">
+            <div>
+              <div className="section-marker"><span />Pourquoi 3LM</div>
+              <h2>Une approche claire, professionnelle et orientée résultats.</h2>
+              <p>Nous relions vision business, expérience utilisateur et exécution technique pour livrer des solutions utiles dès le premier jour.</p>
+            </div>
+            <div className="why-list">
+              <article><b>01</b><div><h3>Conseil pragmatique</h3><p>Des recommandations adaptées à vos priorités, vos contraintes et votre budget.</p></div></article>
+              <article><b>02</b><div><h3>Solutions sécurisées</h3><p>Une attention constante à la fiabilité, la confidentialité et la maintenance.</p></div></article>
+              <article><b>03</b><div><h3>Exécution agile</h3><p>Des cycles courts, des livrables visibles et une communication transparente.</p></div></article>
+              <article><b>04</b><div><h3>Accompagnement complet</h3><p>De l&rsquo;idée initiale au déploiement, puis au support et à l&rsquo;évolution.</p></div></article>
+            </div>
+          </div>
+        </section>
+
+        <section className="home-about">
+          <div className="about-copy">
+            <div className="section-marker"><span />À propos</div>
+            <h2>Un partenaire technologique pour vos projets essentiels.</h2>
+            <p>Chez 3LM Solutions, nous concevons des outils numériques sur mesure pour aider les entreprises à gagner en performance, automatiser leurs opérations et mieux exploiter leurs données.</p>
+            <p>Notre équipe combine savoir-faire technique, sens du service et recherche de résultats mesurables — des solutions modernes, prêtes à accompagner votre croissance.</p>
+          </div>
+          <div className="home-stats">
+            <strong>30+<small>Clients accompagnés</small></strong>
+            <strong>85+<small>Projets logiciels livrés</small></strong>
+            <strong>7+<small>Pays desservis</small></strong>
+          </div>
+        </section>
+
+        <section className="home-services">
+          <div className="section-marker"><span />Services</div>
+          <div className="section-heading">
+            <h2>Des compétences digitales réunies dans une même équipe.</h2>
+            <p>Chaque service est pensé pour réduire la complexité et donner à vos équipes des outils fiables au quotidien.</p>
+          </div>
+          <div className="service-links">
+            {services.map((label) => (
+              <Link href="/rendez-vous" key={label}>{label}<span>↗</span></Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="home-contact-strip">
+          <div>
+            <div className="section-marker"><span />Entrer en contact</div>
+            <h2>Votre prochain projet mérite une base solide.</h2>
+            <p>Expliquez-nous votre besoin en 15 minutes et repartez avec une approche claire, chiffrée et réaliste.</p>
+          </div>
+          <Link href="/rendez-vous" className="gradient-button">Programmer un appel →</Link>
         </section>
       </main>
-
-      <footer className="border-t border-[var(--line)] py-6 text-center text-xs text-[var(--ink-soft)]">
-        © {new Date().getFullYear()} 3LM Solutions — Tous droits réservés.
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

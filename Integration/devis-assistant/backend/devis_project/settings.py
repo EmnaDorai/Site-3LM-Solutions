@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'devis',
+    'chat',
 ]
 
 REST_FRAMEWORK = {
@@ -101,8 +102,12 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT'),
     }
 }
-# Configuration OpenAI
+# Configuration OpenAI (chatbot du site)
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4o-mini')
+OPENAI_MAX_OUTPUT_TOKENS = int(os.getenv('OPENAI_MAX_OUTPUT_TOKENS', '320'))
+OPENAI_TEMPERATURE = float(os.getenv('OPENAI_TEMPERATURE', '0.35'))
+CHAT_CONTEXT_MESSAGE_LIMIT = int(os.getenv('CHAT_CONTEXT_MESSAGE_LIMIT', '12'))
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

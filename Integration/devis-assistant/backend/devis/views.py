@@ -44,8 +44,14 @@ class PrestationViewSet(viewsets.ModelViewSet):
 
 
 class DevisViewSet(viewsets.ModelViewSet):
-    queryset = Devis.objects.all().order_by('-date_creation')
     serializer_class = DevisSerializer
+
+    def get_queryset(self):
+        qs = Devis.objects.all().order_by('-date_creation')
+        client_id = self.request.query_params.get('client')
+        if client_id:
+            qs = qs.filter(client_id=client_id)
+        return qs
 
     def perform_create(self, serializer):
         devis = serializer.save(manager=self.request.user if self.request.user.is_authenticated else None)

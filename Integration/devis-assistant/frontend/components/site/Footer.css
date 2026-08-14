@@ -1,0 +1,18 @@
+#footer{background:var(--bg-soft);color:var(--muted);padding:64px 26px 24px;border-top:1px solid var(--line)}
+.footer-inner{max-width:1176px;margin:auto}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1.3fr;gap:48px;margin-bottom:48px}
+.footer-brand-name{display:block;color:var(--ink);font:700 18px 'Space Grotesk',sans-serif;margin-bottom:12px}
+.footer-brand-name span{background:var(--gradient);-webkit-background-clip:text;background-clip:text;color:transparent}
+.footer-brand p{font-size:12.5px;line-height:1.7;max-width:280px}
+.footer-col h4{color:var(--ink);font:700 11px 'Inter',sans-serif;letter-spacing:1px;text-transform:uppercase;margin-bottom:15px}
+.footer-col ul{list-style:none}
+.footer-col li{margin-bottom:9px}
+.footer-col a,.footer-contact-item,.footer-contact-item a{color:var(--muted);text-decoration:none;font-size:12.5px}
+.footer-col a:hover,.footer-contact-item a:hover{color:var(--a2)}
+.footer-contact-item{margin-bottom:9px}
+.socials{display:flex;gap:8px;margin-top:18px}
+.social{width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;color:var(--ink);text-decoration:none;font-size:11px;transition:border-color .2s,color .2s}
+.social:hover{border-color:var(--a2);color:var(--a2)}
+.footer-bottom{border-top:1px solid var(--line);padding-top:18px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#6b7189;font-size:11px}
+@media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr;gap:30px}}
+@media(max-width:580px){.footer-grid{grid-template-columns:1fr}.footer-bottom{flex-direction:column}}

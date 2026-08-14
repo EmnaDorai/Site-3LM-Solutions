@@ -7,6 +7,7 @@ import api from '@/lib/api';
 import { createRendezVous } from '@/lib/rendezvous';
 import { Client, Devis } from '@/lib/types';
 import PageHeader from '@/components/PageHeader';
+import ClientPicker from '@/components/ClientPicker';
 import { TYPE_RDV_CONFIG } from '@/lib/statusRdv';
 
 function StepBadge({ n }: { n: number }) {
@@ -59,7 +60,6 @@ function NouveauRendezVousForm() {
       .catch(() => setDevisList([]));
   }, [clientId]);
 
-  const selectedClient = clients.find((c) => String(c.id) === clientId);
   const isPrefilled = Boolean(preselectedClient);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -108,54 +108,20 @@ function NouveauRendezVousForm() {
             <span className="text-xs uppercase tracking-wider text-[var(--ink-soft)] font-mono-num">Client</span>
           </div>
 
-          {isPrefilled && selectedClient ? (
-            <div className="rounded-xl border-2 border-transparent bg-[var(--surface)] p-4 shadow-md">
-              <p className="font-medium text-sm">{selectedClient.nom}</p>
-              {selectedClient.entreprise && <p className="text-xs text-[var(--ink-soft)] mt-0.5">{selectedClient.entreprise}</p>}
-              <p className="text-xs text-[var(--ink-soft)] font-mono-num mt-1">{selectedClient.email}</p>
-              {preselectedDevis && (
-                <p className="text-xs mt-2 font-semibold" style={{ color: 'var(--accent-secondary)' }}>
-                  Lié au devis #{preselectedDevis}
-                </p>
-              )}
-            </div>
-          ) : loadingClients ? (
-            <p className="text-sm text-[var(--ink-soft)]">Chargement...</p>
-          ) : clients.length === 0 ? (
-            <p className="text-sm text-[var(--ink-soft)]">Aucun client disponible.</p>
-          ) : (
-            <div className="grid sm:grid-cols-2 gap-3">
-              {clients.map((c) => {
-                const selected = String(c.id) === clientId;
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => {
-                      setClientId(String(c.id));
-                      setDevisId('');
-                    }}
-                    className={`text-left p-4 rounded-xl border-2 transition-all duration-200 ${
-                      selected ? 'border-transparent bg-[var(--surface)] shadow-md' : 'border-[var(--line)] bg-[var(--surface)] hover:border-[var(--accent-secondary)]'
-                    }`}
-                    style={
-                      selected
-                        ? {
-                            backgroundImage:
-                              'linear-gradient(var(--surface), var(--surface)), linear-gradient(135deg, var(--accent-secondary), var(--accent-primary))',
-                            backgroundOrigin: 'border-box',
-                            backgroundClip: 'padding-box, border-box',
-                          }
-                        : undefined
-                    }
-                  >
-                    <p className="font-medium text-sm">{c.nom}</p>
-                    {c.entreprise && <p className="text-xs text-[var(--ink-soft)] mt-0.5">{c.entreprise}</p>}
-                    <p className="text-xs text-[var(--ink-soft)] font-mono-num mt-1">{c.email}</p>
-                  </button>
-                );
-              })}
-            </div>
+          <ClientPicker
+            clients={clients}
+            loading={loadingClients}
+            selectedId={clientId}
+            locked={isPrefilled}
+            onSelect={(id) => {
+              setClientId(id);
+              setDevisId('');
+            }}
+          />
+          {isPrefilled && preselectedDevis && (
+            <p className="text-xs mt-2 font-semibold" style={{ color: 'var(--accent-secondary)' }}>
+              Lié au devis #{preselectedDevis}
+            </p>
           )}
 
           {!isPrefilled && clientId && devisList.length > 0 && (

@@ -1,0 +1,16 @@
+# Environnement virtuel Python
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Secrets & configuration locale
+.env
+
+# Base de données locale
+db.sqlite3
+
+# Fichiers générés
+staticfiles/
+media/
+*.log

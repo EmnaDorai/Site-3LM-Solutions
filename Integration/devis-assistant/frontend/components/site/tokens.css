@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+.site-lm {
+  --bg: #05060a;
+  --bg-soft: #0a0d16;
+  --ink: #f4f5fa;
+  --muted: #9aa1b8;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-soft: rgba(255, 255, 255, 0.05);
+  --surface: rgba(255, 255, 255, 0.035);
+  --surface-solid: #0c0f1a;
+  --a: #6d6bff;
+  --a2: #22d3ee;
+  --violet: #a78bfa;
+  --gradient: linear-gradient(115deg, #6d6bff 0%, #22d3ee 100%);
+  --gradient-text: linear-gradient(100deg, #ffffff 25%, #b9c0ff 60%, #22d3ee 100%);
+  font-family: 'Inter', sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+.site-lm *, .site-lm *::before, .site-lm *::after { box-sizing: border-box; }
+.site-lm a { color: inherit; }
+.site-lm button, .site-lm input, .site-lm textarea { font: inherit; }
+.site-lm { scroll-behavior: smooth; }
+.site-lm section[id] { scroll-margin-top: 88px; }
+.site-lm .gradient-text {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

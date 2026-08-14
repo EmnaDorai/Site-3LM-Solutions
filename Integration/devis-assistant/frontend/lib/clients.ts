@@ -11,6 +11,11 @@ export async function fetchClients(filters?: ClientFilters): Promise<Client[]> {
   return res.data;
 }
 
+export async function fetchClient(id: number | string): Promise<Client> {
+  const res = await api.get(`/clients/${id}/`);
+  return res.data;
+}
+
 export async function updateClientStatut(id: number | string, statut: StatutClient): Promise<Client> {
   const res = await api.patch(`/clients/${id}/`, { statut });
   return res.data;

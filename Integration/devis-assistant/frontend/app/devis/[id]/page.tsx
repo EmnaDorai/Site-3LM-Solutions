@@ -8,10 +8,12 @@ import AssistantPanel from '@/components/AssistantPanel';
 import DevisPreview from '@/components/DevisPreview';
 import StatusBadge from '@/components/StatusBadge';
 import LigneDirectePanel from '@/components/LigneDirectePanel';
-import { Devis } from '@/lib/types';
+import { Devis, LigneDevis } from '@/lib/types';
 import { fetchDevis, genererDevisIA, updateDevis, validerDevis, telechargerPdfDevis, deleteDevis } from '@/lib/devis';
+import { useToast } from '@/components/ToastProvider';
 
 export default function DevisDetailPage() {
+  const toast = useToast();
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -71,6 +73,12 @@ export default function DevisDetailPage() {
     } catch {
       setGenError('Impossible de mettre à jour les besoins.');
     }
+  };
+
+  const handleSaveLignes = async (lignes: LigneDevis[], estimation: number) => {
+    const updated = await updateDevis(id, { lignes, estimation_montant: estimation });
+    setDevis(updated);
+    toast.success('Lignes du devis mises à jour.');
   };
 
   const handleValider = async () => {
@@ -143,8 +151,8 @@ export default function DevisDetailPage() {
   const canValidate = Boolean(devis.synthese_ia) && devis.statut === 'brouillon';
 
   return (
-    <div className="flex flex-col h-screen">
-      <header className="shrink-0 px-8 py-5 border-b border-[var(--line)] bg-[var(--surface)]">
+    <div className="flex flex-col min-h-screen">
+      <header className="shrink-0 sticky top-0 z-10 px-8 py-5 border-b border-[var(--line)] bg-[var(--surface)]">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
             <Link href="/devis" className="text-xs font-semibold uppercase tracking-wide transition-colors" style={{ color: 'var(--accent-secondary)' }}>
@@ -165,7 +173,7 @@ export default function DevisDetailPage() {
                 type="button"
                 onClick={handleValider}
                 disabled={validating || generating}
-                className="rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
+                className="btn-press rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
                 style={{ background: 'var(--accent-sage)' }}
               >
                 {validating ? 'Validation...' : 'Valider le devis'}
@@ -180,7 +188,7 @@ export default function DevisDetailPage() {
                   type="button"
                   onClick={handleTelechargerPdf}
                   disabled={downloading}
-                  className="rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
+                  className="btn-press rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
                   style={{ background: 'var(--accent-primary)' }}
                 >
                   {downloading ? 'Téléchargement...' : '⬇ Télécharger le PDF'}
@@ -231,8 +239,8 @@ export default function DevisDetailPage() {
         </div>
       )}
 
-      <div className="flex-1 grid lg:grid-cols-2 min-h-0 divide-x divide-[var(--line)]">
-        <div className="min-h-0 overflow-hidden bg-[var(--paper)]">
+      <div className="flex-1 grid lg:grid-cols-2 items-start divide-x divide-[var(--line)]">
+        <div className="bg-[var(--paper)]">
           <AssistantPanel
             besoins={devis.besoins_client}
             synthese={devis.synthese_ia}
@@ -243,8 +251,15 @@ export default function DevisDetailPage() {
             readOnly={isValide}
           />
         </div>
-        <div className="min-h-0 overflow-hidden bg-[var(--paper)] p-5">
-          <DevisPreview lignes={devis.lignes ?? []} estimation={devis.estimation_montant} clientNom={devis.client_nom} devisId={devis.id} />
+        <div className="bg-[var(--paper)] p-5 lg:sticky lg:top-4">
+          <DevisPreview
+            lignes={devis.lignes ?? []}
+            estimation={devis.estimation_montant}
+            clientNom={devis.client_nom}
+            devisId={devis.id}
+            readOnly={isValide}
+            onSave={handleSaveLignes}
+          />
         </div>
       </div>
     </div>

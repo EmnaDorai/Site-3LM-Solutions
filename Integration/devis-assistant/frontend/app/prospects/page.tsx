@@ -6,10 +6,12 @@ import { fetchClients, updateClientStatut, deleteClient } from '@/lib/clients';
 import { Client, StatutClient } from '@/lib/types';
 import { STATUT_CLIENT_CONFIG } from '@/lib/statusClient';
 import PageHeader from '@/components/PageHeader';
+import { useToast } from '@/components/ToastProvider';
 
 const STATUT_FILTERS = ['tous', ...Object.keys(STATUT_CLIENT_CONFIG)] as const;
 
 export default function ProspectsPage() {
+  const toast = useToast();
   const [list, setList] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -50,8 +52,9 @@ export default function ProspectsPage() {
     try {
       const updated = await updateClientStatut(id, statut);
       setList((l) => l.map((c) => (c.id === id ? updated : c)));
+      toast.success('Statut mis à jour.');
     } catch {
-      alert('Impossible de mettre à jour le statut.');
+      toast.error('Impossible de mettre à jour le statut.');
     } finally {
       setUpdatingId(null);
     }
@@ -63,8 +66,9 @@ export default function ProspectsPage() {
     try {
       await deleteClient(id);
       setList((l) => l.filter((c) => c.id !== id));
+      toast.success('Prospect supprimé.');
     } catch {
-      alert('Impossible de supprimer ce prospect.');
+      toast.error('Impossible de supprimer ce prospect.');
     } finally {
       setDeletingId(null);
     }
@@ -82,7 +86,7 @@ export default function ProspectsPage() {
             { label: 'Qualifiés', value: stats.qualifie, from: 'var(--accent-primary)', to: 'var(--accent-secondary)' },
             { label: 'Clients', value: stats.client, from: 'var(--accent-sage)', to: 'var(--accent-secondary)' },
           ].map((s) => (
-            <div key={s.label} className="relative overflow-hidden rounded-2xl bg-[var(--surface)] border border-[var(--line)] px-5 py-4">
+            <div key={s.label} className="card-hover relative overflow-hidden rounded-2xl bg-[var(--surface)] border border-[var(--line)] px-5 py-4">
               <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundImage: `linear-gradient(90deg, ${s.from}, ${s.to})` }} />
               <p className="font-mono-num text-[11px] uppercase tracking-wider text-[var(--ink-soft)]">{s.label}</p>
               <p className="font-display text-3xl font-semibold mt-1 bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(135deg, ${s.from}, ${s.to})` }}>
@@ -151,16 +155,25 @@ export default function ProspectsPage() {
             <span>Statut</span>
             <span />
           </div>
-          {filtered.map((c) => (
+          {filtered.map((c, i) => (
             <div
               key={c.id}
-              className="grid grid-cols-[1fr_180px_160px_36px] px-5 py-4 items-center border-b border-[var(--line)] last:border-0"
+              className="row-in grid grid-cols-[1fr_180px_160px_36px] px-5 py-4 items-center border-b border-[var(--line)] last:border-0 transition-colors hover:bg-[rgba(108,92,231,0.04)]"
+              style={{ animationDelay: `${Math.min(i, 10) * 25}ms` }}
             >
-              <div className="min-w-0 pr-4">
-                <Link href={`/devis?client=${c.id}`} className="font-medium text-sm block truncate hover:text-[var(--accent-secondary)] transition-colors">
-                  {c.prenom} {c.nom}
-                </Link>
-                {c.entreprise && <span className="text-[11px] text-[var(--ink-soft)]">{c.entreprise}</span>}
+              <div className="min-w-0 pr-4 flex items-center gap-3">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0"
+                  style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-secondary), var(--accent-primary))' }}
+                >
+                  {(c.prenom?.[0] ?? c.nom[0] ?? '?').toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <Link href={`/clients/${c.id}`} className="font-medium text-sm block truncate hover:text-[var(--accent-secondary)] transition-colors">
+                    {c.prenom} {c.nom}
+                  </Link>
+                  {c.entreprise && <span className="text-[11px] text-[var(--ink-soft)]">{c.entreprise}</span>}
+                </div>
               </div>
               <div className="text-xs text-[var(--ink-soft)] min-w-0">
                 <p className="truncate">{c.email}</p>

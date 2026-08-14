@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Sidebar from './Sidebar';
+import ChatWidget from './ChatWidget';
+import GlobalSearch from './GlobalSearch';
+import PageTransition from './PageTransition';
 import { getToken } from '@/lib/auth';
 
 const PUBLIC_PATHS = ['/', '/rendez-vous', '/reservation', '/login'];
@@ -32,7 +35,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }, [pathname, publicPath, router]);
 
   if (publicPath) {
-    return <main className="min-h-screen bg-[var(--paper)]">{children}</main>;
+    return (
+      <div className="min-h-screen">
+        {children}
+        <ChatWidget />
+      </div>
+    );
   }
 
   if (!checked) {
@@ -46,7 +54,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 bg-[var(--paper)] min-h-screen flex flex-col">{children}</main>
+      <main className="flex-1 bg-[var(--paper)] min-h-screen flex flex-col min-w-0">
+        <PageTransition>{children}</PageTransition>
+      </main>
+      <GlobalSearch />
     </div>
   );
 }

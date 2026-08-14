@@ -1,6 +1,6 @@
-# 3LM Solutions — Assistant Devis IA & Ligne Directe
+# 3LM Solutions — Assistant Devis IA, Ligne Directe & Chatbot
 
-Application interne pour l'équipe commerciale de 3LM Solutions : génération de devis assistée par IA et prise de rendez-vous, réunies dans un seul projet Django + Next.js.
+Application interne pour l'équipe commerciale de 3LM Solutions : génération de devis assistée par IA, prise de rendez-vous, et chatbot public du site, réunis dans un seul projet Django + Next.js.
 
 ```
 devis-assistant/
@@ -115,3 +115,18 @@ Si `EMAIL_HOST` est laissé vide, `EmailBackend` console affiche les emails dans
 ## 6. PDF de devis
 
 Généré avec **WeasyPrint** (rendu CSS complet, SVG natif) à partir d'un template HTML aux couleurs 3LM Solutions (bannière vague marine/rouge, logo, statut coloré). Pagination gérée via `@page` : la première page est pleine largeur (bannière en haut), les pages suivantes ont une marge de tête classique pour rester lisibles.
+
+## 7. Chatbot du site (assistant IA visiteur)
+
+Un widget de chat (bulle en bas à droite) répond aux questions des visiteurs sur les services de 3LM Solutions et les oriente vers la prise de rendez-vous. Intégré depuis le projet `business-website-chatbot-main` (Cahier des charges N°1), porté dans `devis-assistant` :
+
+- **Backend** : app Django `chat` (`Conversation`, `Message`), endpoint public `POST /api/chat/messages/` (session par `session_id` stocké en `localStorage` côté visiteur), utilise l'API **OpenAI** (`gpt-4o-mini` par défaut) avec une base de connaissances (`backend/chat/knowledge_base/3lm_solutions.md`) décrivant les services, la mission et les coordonnées de l'entreprise. Sans `OPENAI_API_KEY`, le widget répond avec un message de repli explicite plutôt que d'échouer silencieusement.
+- **Frontend** : composant `ChatWidget` monté uniquement sur les pages publiques (`/`, `/rendez-vous`, `/login`) via `AppShell` — absent de l'espace admin.
+- **Variables d'environnement** (`.env` backend) : `OPENAI_API_KEY`, `OPENAI_MODEL` (def. `gpt-4o-mini`), `OPENAI_MAX_OUTPUT_TOKENS`, `OPENAI_TEMPERATURE`, `CHAT_CONTEXT_MESSAGE_LIMIT`.
+- L'historique des conversations est consultable dans `/admin/` (Django admin natif, modèles `Conversation`/`Message`).
+
+| Méthode | URL                                          | Accès   | Description |
+|---------|-----------------------------------------------|---------|--------------|
+| POST    | `/api/chat/messages/`                          | public  | Envoie un message, crée/poursuit une conversation, retourne la réponse IA |
+| GET     | `/api/chat/conversations/session/{session_id}/`| public  | Historique d'une conversation par session |
+| GET     | `/api/chat/conversations/{id}/`                | admin   | Historique d'une conversation par ID |

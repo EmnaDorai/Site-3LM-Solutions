@@ -28,6 +28,11 @@ export async function fetchDevis(id: number | string): Promise<Devis> {
   return res.data;
 }
 
+export async function fetchDevisList(filters?: { client?: number | string }): Promise<Devis[]> {
+  const res = await api.get('/devis/', { params: filters });
+  return res.data;
+}
+
 export async function genererDevisIA(
   id: number | string,
   instructions?: string
