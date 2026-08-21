@@ -2,11 +2,18 @@
 .navbar.is-scrolled{background:rgba(5,6,10,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
 .nav-wrap{max-width:1240px;height:76px;margin:auto;padding:0 28px;display:flex;align-items:center;gap:28px;transition:height .3s ease}
 .navbar.is-scrolled .nav-wrap{height:68px}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;min-width:210px}
-.brand-logo{width:38px;height:38px;border-radius:50%;object-fit:cover}
-.brand span{display:flex;flex-direction:column;gap:3px}
-.brand strong{font:700 14px 'Space Grotesk',sans-serif;letter-spacing:.2px;color:var(--ink)}
-.brand small{color:var(--muted);font-size:10px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:210px}
+.brand-logo{border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(255,255,255,.08)}
+.brand span{display:flex;flex-direction:column;gap:2px}
+.brand strong{
+  font:800 17px 'Space Grotesk',sans-serif;
+  letter-spacing:.4px;
+  background:var(--gradient-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.brand small{color:var(--muted);font:500 11px 'Inter',sans-serif;letter-spacing:.2px}
 .desktop-nav{display:flex;align-items:center;justify-content:center;gap:4px;flex:1}
 .desktop-nav>a{padding:9px 14px;border:0;background:none;color:var(--muted);text-decoration:none;font:500 13px 'Inter',sans-serif;cursor:pointer;border-radius:20px;white-space:nowrap;transition:color .2s,background .2s}
 .desktop-nav>a:hover,.desktop-nav>a.active{color:var(--ink);background:rgba(255,255,255,.06)}

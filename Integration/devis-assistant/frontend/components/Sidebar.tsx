@@ -76,9 +76,15 @@ export default function Sidebar() {
     <aside className="w-64 shrink-0 bg-[var(--surface)] border-r border-[var(--line)] flex flex-col justify-between">
       <div className="flex flex-col min-h-0">
         <Link href="/dashboard" className="px-6 py-6 flex items-center gap-3 border-b border-[var(--line)] shrink-0">
-          <LogoMark size={52} />
+          <LogoMark size={46} className="rounded-full ring-2 ring-white shadow-sm" />
           <div className="min-w-0">
-            <p className="text-[11px] text-[var(--ink-soft)] leading-snug">Assistant devis &amp; Ligne directe</p>
+            <p
+              className="font-display text-[15px] font-extrabold tracking-tight leading-tight truncate bg-clip-text text-transparent"
+              style={{ backgroundImage: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))' }}
+            >
+              3LM SOLUTIONS
+            </p>
+            <p className="text-[11px] text-[var(--ink-soft)] mt-0.5 leading-snug">Assistant devis &amp; Ligne directe</p>
           </div>
         </Link>
 

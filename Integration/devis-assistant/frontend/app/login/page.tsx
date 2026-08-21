@@ -36,7 +36,8 @@ function LoginForm() {
       <main className="auth-page">
         <section className="auth-brand-panel">
           <div className="brand-mark">
-            <LogoMark size={56} />
+            <LogoMark size={52} />
+            <span>3LM SOLUTIONS</span>
           </div>
           <div>
             <span className="auth-kicker">3LM SOLUTIONS</span>

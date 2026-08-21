@@ -12,8 +12,8 @@ export default function LogoMark({ size = 40, className = '' }: LogoMarkProps) {
       alt="3LM Solutions"
       width={size}
       height={size}
-      className={`rounded-lg object-cover shrink-0 ${className}`}
-      style={{ width: size, height: size }}
+      className={`object-cover shrink-0 ${className}`}
+      style={{ width: size, height: size, objectPosition: 'top center' }}
     />
   );
 }
