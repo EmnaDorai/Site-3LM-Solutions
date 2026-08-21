@@ -75,7 +75,7 @@ export default function ChatWidget() {
         {
           sender: 'bot',
           content:
-            "Désolé, le service de chat ne répond pas pour le moment. Vous pouvez contacter 3LM Solutions au +216 54 507 574 ou à contact@3lmsolutions.net.",
+            "Désolé, le service de chat ne répond pas pour le moment. Vous pouvez contacter 3LM Solutions au +216 54 507 574 ou à 3lmsolutions@gmail.com.",
         },
       ]);
     } finally {

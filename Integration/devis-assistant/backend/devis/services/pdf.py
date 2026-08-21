@@ -9,7 +9,7 @@ LOGO_PATH = Path(settings.BASE_DIR) / 'devis' / 'static' / 'devis' / 'logo_3lm.p
 COMPANY_INFO = {
     'nom': '3LM Solutions',
     'adresse': 'Ariana',
-    'email': '3LMSolutions@gmail.com',
+    'email': '3lmsolutions@gmail.com',
     'telephone': '',
 }
 

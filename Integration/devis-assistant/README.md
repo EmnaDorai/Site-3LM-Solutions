@@ -107,7 +107,7 @@ EMAIL_PORT=587
 EMAIL_HOST_USER=votre-compte-brevo
 EMAIL_HOST_PASSWORD=votre-cle-smtp-brevo
 EMAIL_USE_TLS=true
-DEFAULT_FROM_EMAIL=contact@3lmsolutions.tn
+DEFAULT_FROM_EMAIL=3lmsolutions@gmail.com
 ```
 
 Si `EMAIL_HOST` est laissé vide, `EmailBackend` console affiche les emails dans le terminal (pratique en développement). Chaque endpoint renvoie un indicateur de succès/échec d'envoi (`email_warning`, `email_envoye`) plutôt que d'échouer silencieusement.

@@ -27,9 +27,8 @@ export default function SiteNavbar() {
     <header className={`navbar ${scrolled ? 'is-scrolled' : ''}`}>
       <div className="nav-wrap">
         <Link href="/" className="brand" aria-label="3LM Solutions, accueil">
-          <LogoMark size={42} className="brand-logo" />
+          <LogoMark size={48} className="brand-logo" />
           <span>
-            <strong>3LM SOLUTIONS</strong>
             <small>Conseil &amp; solutions digitales</small>
           </span>
         </Link>

@@ -41,7 +41,7 @@ export default function SiteFooter() {
             <h4>Contact</h4>
             <div className="footer-contact-item">📍 Ariana, Tunisie</div>
             <div className="footer-contact-item">📞 <a href="tel:+21654507574">+216 54 507 574</a></div>
-            <div className="footer-contact-item">✉️ <a href="mailto:contact@3lmsolutions.net">contact@3lmsolutions.net</a></div>
+            <div className="footer-contact-item">✉️ <a href="mailto:3lmsolutions@gmail.com">3lmsolutions@gmail.com</a></div>
           </div>
         </div>
         <div className="footer-bottom">

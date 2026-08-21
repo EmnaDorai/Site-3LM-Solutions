@@ -29,7 +29,7 @@ def _fallback_response() -> str:
         "Je peux vous aider sur les services de 3LM Solutions : IA, analyse de donnees, IoT, ERP, DevOps, "
         "developpement web/mobile et community management.\n"
         "Pour discuter de votre projet ou fixer un rendez-vous, utilisez la page \"Prendre rendez-vous\" du site "
-        "ou contactez l'equipe au +216 54 507 574 / contact@3lmsolutions.net."
+        "ou contactez l'equipe au +216 54 507 574 / 3lmsolutions@gmail.com."
     )
 
 

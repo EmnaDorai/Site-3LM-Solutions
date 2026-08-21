@@ -25,7 +25,7 @@
 
 ### How can prospects contact 3LM Solutions?
 
-Prospects can call +216 54 507 574, email contact@3lmsolutions.net, or book a meeting directly from the "Prendre rendez-vous" page of the site.
+Prospects can call +216 54 507 574, email 3lmsolutions@gmail.com, or book a meeting directly from the "Prendre rendez-vous" page of the site.
 
 ### Can 3LM Solutions discuss a custom project?
 
@@ -158,4 +158,4 @@ When a visitor asks about pricing, project feasibility, timelines, audits, demos
 
 - Book a meeting: use the "Prendre rendez-vous" page of the site (the appointment form)
 - Phone: +216 54 507 574
-- Email: contact@3lmsolutions.net
+- Email: 3lmsolutions@gmail.com

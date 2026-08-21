@@ -76,10 +76,9 @@ export default function Sidebar() {
     <aside className="w-64 shrink-0 bg-[var(--surface)] border-r border-[var(--line)] flex flex-col justify-between">
       <div className="flex flex-col min-h-0">
         <Link href="/dashboard" className="px-6 py-6 flex items-center gap-3 border-b border-[var(--line)] shrink-0">
-          <LogoMark size={40} />
+          <LogoMark size={52} />
           <div className="min-w-0">
-            <p className="font-display text-sm font-extrabold tracking-tight leading-tight truncate">3LM SOLUTIONS</p>
-            <p className="text-[11px] text-[var(--ink-soft)] mt-0.5">Assistant devis &amp; Ligne directe</p>
+            <p className="text-[11px] text-[var(--ink-soft)] leading-snug">Assistant devis &amp; Ligne directe</p>
           </div>
         </Link>
 
